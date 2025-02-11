@@ -47,7 +47,7 @@ const checkEmail = (email) => {
 };
 // Création d'une fonction qui vérifie et valide la sécurité du mot de passe
 const checkPassword = (password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
     return passwordRegex.test(password);
 };
 // Création d'une fonction qui vérifie et valide la longueur du mot de passe
@@ -64,13 +64,13 @@ exports.add = async (req, res, next) => {
         password: req.body.password
     });
 
-    if (!checkEmail(email)) {
+    if (!checkEmail(temp.email)) {
         return res.status(400).json({ error: "Adresse email invalide."});
     }
-    if (!checkPassword(password)) {
+    if (!checkPassword(temp.password)) {
         return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
     }
-    if (!checkPasswordLength(email)) {
+    if (!checkPasswordLength(temp.password)) {
         return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
     }
 
