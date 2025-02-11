@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+const service = require('../services/users');
+
+// Import du middleware pour privatisation
+const private = require('../middlewares/private');
+
+// Route d'authentification
+router.post('/authenticate', service.authenticate);
 
 module.exports = router;
