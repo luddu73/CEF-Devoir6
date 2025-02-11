@@ -4,8 +4,10 @@ var router = express.Router();
 const service = require('../services/users');
 
 // Import du middleware pour privatisation
-const private = require('../middlewares/private');
+// PAS ENCORE UTILISER const private = require('../middlewares/private');
 
+// Route pour créer un utilisateur
+router.put('/add', service.add);
 // Route d'authentification
 router.post('/authenticate', service.authenticate);
 

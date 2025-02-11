@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -37,5 +37,48 @@ exports.authenticate = async (req, res, next) => {
         }
     } catch (error) {
         return res.status(501).json(error);
+    }
+}
+
+// Création d'une fonction pour valider la présentation de l'email 
+const checkEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
+// Création d'une fonction qui vérifie et valide la sécurité du mot de passe
+const checkPassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+    return passwordRegex.test(password);
+};
+// Création d'une fonction qui vérifie et valide la longueur du mot de passe
+const checkPasswordLength = (password) => {
+    return password.length >= 8;
+};
+
+// Callback de création d'un utilisateur
+exports.add = async (req, res, next) => {
+
+    const temp = ({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    if (!checkEmail(email)) {
+        return res.status(400).json({ error: "Adresse email invalide."});
+    }
+    if (!checkPassword(password)) {
+        return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+    }
+    if (!checkPasswordLength(email)) {
+        return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+    }
+
+    try {
+        let user = await User.create(temp);
+
+        return res.status(201).json(user);
+    } catch (error) {
+        return res.status(501).json(error)
     }
 }
