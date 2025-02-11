@@ -20,12 +20,26 @@ const Reservation = new Schema({
     startDate: {
         type: Date,
         trim: true,
-        required: [true, "La date de début de la réservation doit être renseignée."]
+        required: [true, "La date de début de la réservation doit être renseignée."],
+        validate: {
+            validator: function (startDate) {
+                const actualDate = new Date();
+                actualDate.setHours(0, 0, 0, 0); // Remise à zéro de l'heure
+                return startDate >= actualDate;
+            },
+            message: "La date de début ne peut être postérieure à aujourd'hui."
+        }
     },
     endDate: {
         type: Date,
         trim: true,
-        required: [true, "La date de fin de la réservation doit être renseignée."]
+        required: [true, "La date de fin de la réservation doit être renseignée."],
+        validate: {
+            validator: function (endDate) {
+                return this.startDate < endDate; // J'impose que la date de fin soit supérieur à la date de début
+            },
+            message: "La date de fin doit être postérieure à la date de début.",
+        }
     }
 });
 
