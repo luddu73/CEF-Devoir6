@@ -1,15 +1,43 @@
-const User = require('../models/users');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: users.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: users.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 /**
- * Authentifie un utilisateur en vérifiant l'email et le mot de passe
+ * Permet de créer un nouvel utilisateur
  * @async
  * @function authenticate
- * @param {object} req - Objet de la requête avec les données de l'utilisateur qui souhaite se connecté.
- * @param {object} res - L'objet de réponse Express.
+ * @param {Request} req - Objet de la requête avec les données de l'utilisateur à créer.
+ * @param {Response} res - L'objet de réponse Express.
  * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<void>} Répond avec un token JWT si authentification correct, ou une erreur
+ * @returns {Promise&lt;Response>} Retourne une réponse JSON qui valide la connexion et créer le token ou une erreur
  */
 exports.authenticate = async (req, res, next) => {
     const { email, password } = req.body; // On récupère l'email et le password proposé
@@ -54,36 +82,21 @@ exports.authenticate = async (req, res, next) => {
  * @async
  * @function checkEmail
  * @param {string} email - L'email à vérifier
- * @returns {boolean} Retourne une réponse "true" si l'email est conforme, sinon "false"
+ * @returns Retourne une réponse JSON qui indique où non si l'email passe le test de présentation
  */
 const checkEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 };
-
-/**
- * Vérifie la sécurité du mot de passe (1 majuscule, 1 miniscule, 1 chiffre et 1 caractère spécial)
- * @async
- * @function checkPassword
- * @param {string} password - Le mot de passe à vérifier
- * @returns {boolean} Retourne une réponse "true" si le mot de passe est conforme, sinon "false"
- */
+// Création d'une fonction qui vérifie et valide la sécurité du mot de passe
 const checkPassword = (password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]+$/;
     return passwordRegex.test(password);
 };
-
-/**
- * Vérifie la longueur du mot de passe (8 caractères minimum)
- * @async
- * @function checkPasswordLength
- * @param {string} password - Le mot de passe à vérifier
- * @returns {boolean} Retourne une réponse "true" si le mot de passe est conforme, sinon "false"
- */
+// Création d'une fonction qui vérifie et valide la longueur du mot de passe
 const checkPasswordLength = (password) => {
     return password.length >= 8;
 };
-
 /**
  * Permet de créer un nouvel utilisateur
  * @async
@@ -91,9 +104,17 @@ const checkPasswordLength = (password) => {
  * @param {Request} req - Objet de la requête avec les données de l'utilisateur à créer.
  * @param {Response} res - L'objet de réponse Express.
  * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
+ * @returns {Promise&lt;Response>} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
  */
 exports.add = async (req, res, next) => {
+    /**
+     * @typedef {Object} UserData
+     * @property {string} username - le nom de l'utilisateur
+     * @property {string} email - l'adresse email de l'utilisateur
+     * @property {string} password - le mot de passe de l'utilisateur
+     * 
+     * @type {UserData
+     */
     const temp = ({
         username: req.body.username,
         email: req.body.email,
@@ -119,15 +140,7 @@ exports.add = async (req, res, next) => {
     }
 }
 
-/**
- * Permet de récupérer tous les utilisateurs.
- * @async
- * @function getAll
- * @param {Request} req - Objet de la requête Express.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec la liste des utilisateurs ou une erreur
- */
+// Callback qui récupère tout les utilisateurs
 exports.getAll = async (req, res, next) => {
     try {
         let users = await User.find();
@@ -141,15 +154,7 @@ exports.getAll = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-/**
- * Permet de récupérer les données d'un utilisateur grâce à son adresse email.
- * @async
- * @function getByEmail
- * @param {Request} req - Objet de la requête Express contenant l'email dans les paramètres.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec les données de l'utilisateur ou une erreur
- */
+// Callback qui récupère les informations selon un email
 exports.getByEmail = async (req, res, next) => {
     const email = req.params.email
 
@@ -165,15 +170,7 @@ exports.getByEmail = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-/**
- * Met à jour les données d'un utilisateur en l'identifiant par son adresse email.
- * @async
- * @function update
- * @param {Request} req - Objet de la requête Express contenant les nouveaux paramètres à appliquer à l'utilisateur.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec les données de l'utilisateur mise à jour ou une erreur
- */
+// Callback qui modifier un utilisateur
 exports.update = async (req, res, next) => {
     const email = req.params.email
     const temp = ({
@@ -201,16 +198,7 @@ exports.update = async (req, res, next) => {
         return res.status(501).json(error)
     } 
 }
-
-/**
- * Supprime un utilisateur en l'identifiant par son adresse email.
- * @async
- * @function delete
- * @param {Request} req - Objet de la requête Express contenant l'email à supprimer dans les paramètres.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON ou une erreur
- */
+// Callback qui permet de supprimer un utilisateur
 exports.delete = async (req, res, next) => {
     const email = req.params.email
 
@@ -221,4 +209,26 @@ exports.delete = async (req, res, next) => {
     } catch (error) {
         return res.status(501).json(error)
     } 
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#add">add</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkEmail">checkEmail</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Feb 23 2025 22:32:13 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

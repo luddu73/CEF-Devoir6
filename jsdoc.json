@@ -1,11 +1,11 @@
 {
     "source": {
-        "include": ["services", "routes"],
+        "include": ["services","models","routes"],
         "includePattern": ".js$",
         "excludePattern": "(node_modules/|docs)"
     },
     "opts":{
         "recurse": true,
-        "destination": "./docs/"
+        "destination": "./public/docs/"
     }
 }
