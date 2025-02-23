@@ -17,6 +17,6 @@ router.put('/:email', service.update);
 // La route pour supprimer un utilisateur
 router.delete('/:email', service.delete);
 // Route d'authentification
-router.post('/authenticate', service.authenticate);
+router.post('/login', service.authenticate);
 
 module.exports = router;
