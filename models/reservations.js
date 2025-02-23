@@ -36,7 +36,7 @@ const Reservation = new Schema({
         required: [true, "La date de fin de la réservation doit être renseignée."],
         validate: {
             validator: function (endDate) {
-                return this.startDate < endDate; // J'impose que la date de fin soit supérieur à la date de début
+                return this.startDate <= endDate; // J'impose que la date de fin soit supérieur à la date de début
             },
             message: "La date de fin doit être postérieure à la date de début.",
         }

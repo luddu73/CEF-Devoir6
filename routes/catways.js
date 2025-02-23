@@ -23,6 +23,9 @@ router.delete('/:id', service.delete);
 router.get('/:id/reservations', serviceReservation.getByCatway);
 // Route pour lister les infos d'une réservation d'un catway
 router.get('/:id/reservations/:idReservation', serviceReservation.getByIdAndCatway);
+// Route pour créer une réservation sur un catway
+router.post('/:id/reservations/', serviceReservation.checkCatwayExists, serviceReservation.add);
+
 
 
 module.exports = router;
