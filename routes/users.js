@@ -11,7 +11,7 @@ router.get('/', service.getAll);
 // Route pour récupérer les infos d'un utilisateur
 router.get('/:email', service.getByEmail);
 // Route pour créer un utilisateur
-router.put('/add', service.add);
+router.post('/', service.add);
 // La route pour modifier un utilisateur
 router.put('/:email', service.update);
 // La route pour supprimer un utilisateur
