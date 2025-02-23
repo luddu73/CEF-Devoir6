@@ -107,3 +107,49 @@ exports.add = async (req, res, next) => {
         return res.status(501).json(error)
     }
 }
+// Callback qui modifier une réservation
+exports.update = async (req, res, next) => {
+    const idReservation = req.params.idReservation
+    const temp = ({
+        catwayNumber: req.params.id || req.body.catwayNumber,
+        clientName: req.body.clientName,
+        boatName: req.body.boatName,
+        startDate: req.body.startDate,
+        endDate: req.body.endDate
+    });
+
+    if (temp.startDate > temp.endDate) {
+        return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+    }
+
+    try {
+        let reservation = await Reservation.findOne({_id : idReservation});
+
+        if (reservation) {
+            Object.keys(temp).forEach((key) => {
+                if (!!temp[key]) {
+                    reservation[key] = temp[key];
+                }
+            });
+
+            await reservation.save();
+            return res.status(201).json(reservation);
+        }
+
+        return res.status(404).json('Réservation non trouvée');
+    } catch (error) {
+        return res.status(501).json(error)
+    } 
+}
+// Callback qui permet de supprimer une réservation
+exports.delete = async (req, res, next) => {
+    const idReservation = req.params.idReservation
+
+    try {
+        await Reservation.deleteOne({_id : idReservation});
+
+        return res.status(204).json('Réservation supprimée');
+    } catch (error) {
+        return res.status(501).json(error)
+    } 
+}

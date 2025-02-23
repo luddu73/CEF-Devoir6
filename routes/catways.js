@@ -25,6 +25,10 @@ router.get('/:id/reservations', serviceReservation.getByCatway);
 router.get('/:id/reservations/:idReservation', serviceReservation.getByIdAndCatway);
 // Route pour créer une réservation sur un catway
 router.post('/:id/reservations/', serviceReservation.checkCatwayExists, serviceReservation.add);
+// Route pour modifier une réservation sur un catway
+router.put('/:id/reservations/:idReservation', serviceReservation.checkCatwayExists, serviceReservation.update);
+// Route pour supprimer une réservation sur un catway
+router.delete('/:id/reservations/:idReservation', serviceReservation.checkCatwayExists, serviceReservation.delete);
 
 
 
