@@ -82,3 +82,74 @@ exports.add = async (req, res, next) => {
         return res.status(501).json(error)
     }
 }
+
+// Callback qui récupère tout les utilisateurs
+exports.getAll = async (req, res, next) => {
+    try {
+        let users = await User.find();
+
+        if (users) {
+            return res.status(200).json(users);
+        }
+
+        return res.status(404).json('Aucun utilisateur trouvé');
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+// Callback qui récupère les informations selon un email
+exports.getByEmail = async (req, res, next) => {
+    const email = req.params.email
+
+    try {
+        let user = await User.findOne({ email });
+
+        if (user) {
+            return res.status(200).json(user);
+        }
+
+        return res.status(404).json('Utilisateur non trouvé');
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+// Callback qui modifier un utilisateur
+exports.update = async (req, res, next) => {
+    const email = req.params.email
+    const temp = ({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    try {
+        let user = await User.findOne({email : email});
+
+        if (user) {
+            Object.keys(temp).forEach((key) => {
+                if (!!temp[key]) {
+                    user[key] = temp[key];
+                }
+            });
+
+            await user.save();
+            return res.status(201).json(user);
+        }
+
+        return res.status(404).json('Utilisateur non trouvé');
+    } catch (error) {
+        return res.status(501).json(error)
+    } 
+}
+// Callback qui permet de supprimer un utilisateur
+exports.delete = async (req, res, next) => {
+    const email = req.params.email
+
+    try {
+        await User.deleteOne({email : email});
+
+        return res.status(204).json('Utilisateur supprimé');
+    } catch (error) {
+        return res.status(501).json(error)
+    } 
+}
