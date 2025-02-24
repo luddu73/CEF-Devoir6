@@ -187,6 +187,16 @@ exports.update = async (req, res, next) => {
         password: req.body.password
     });
 
+    if (!checkEmail(temp.email)) {
+        return res.status(400).json({ error: "Adresse email invalide."});
+    }
+    if (!checkPassword(temp.password)) {
+        return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+    }
+    if (!checkPasswordLength(temp.password)) {
+        return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+    }
+
     try {
         let user = await User.findOne({email : email});
 

@@ -77,7 +77,7 @@ exports.getByCatway = async (req, res, next) => {
             return res.status(200).json(reservations);
         }
 
-        return res.status(404).json('Aucune réservation trouvée pour ce catway');
+        return res.status(405).json('Aucune réservation trouvée pour ce catway');
     } catch (error) {
         return res.status(501).json(error);
     }
