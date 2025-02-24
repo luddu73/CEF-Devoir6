@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/catways.js</title>
+    <title>JSDoc: Source: routes/users.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: models/catways.js</h1>
+    <h1 class="page-title">Source: routes/users.js</h1>
 
     
 
@@ -27,43 +27,47 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @file Schéma Mongoose pour la collection "catways"
- * @module models/catways
+ * @file Définition des routes pour la gestion des utilisateurs.
+ * @module routes/users
  */
 
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+var express = require('express');
+var router = express.Router();
+
+const service = require('../services/users');
+
+// Import du middleware pour privatisation
+// PAS ENCORE UTILISER const private = require('../middlewares/private');
 
 /**
- * Il définit la structure de la base de donnée des catways
- * @typedef {Object} Catway
- * @property {number} catwayNumber - Le numéro de catway (requis et unique)
- * @property {string} catwayType - Le type de catway (long ou court)
- * @property {string} catwayState - Champ libre permettant de faire un commentaire sur l'état du catway
+ * @route GET /
+ * @description Récupère la liste de tous les utilisateurs.
+ * @group Utilisateurs
+ * @returns {Object} 200 - Liste des utilisateurs.
+ * @returns {Error} 404 - Aucun utilisateur trouvé.
  */
+router.get('/', service.getAll);
 
-const Catway = new Schema({
-    catwayNumber: {
-        type: Number,
-        trim: true,
-        unique: true,
-        required: [true, 'Un numéro de catway est requis']
-    },
-    catwayType: {
-        type: String,
-        trim : true,
-        required: [true, 'Le type du catway doit être "long" ou "court"'],
-        enum: ['long', 'short']
-    },
-    catwayState: {
-        type: String,
-        trim: true,
-        required: [true, "L'état du catway doit être renseigné."]
-    }
-});
+/**
+ * @route GET /
+ * @description Récupère un utilisateur par son adresse email.
+ * @group Utilisateurs
+ * @param {string} email - Adresse email de l'utilisateur recherché.
+ * @returns {Object} 200 - Liste des utilisateurs.
+ * @returns {Error} 404 - Aucun utilisateur trouvé.
+ */
+router.get('/:email', service.getByEmail);
+// Route pour créer un utilisateur
+router.post('/', service.add);
+// La route pour modifier un utilisateur
+router.put('/:email', service.update);
+// La route pour supprimer un utilisateur
+router.delete('/:email', service.delete);
+// Route d'authentification
+router.post('/login', service.authenticate);
 
-
-module.exports = mongoose.model('catways', Catway);</code></pre>
+module.exports = router;
+</code></pre>
         </article>
     </section>
 

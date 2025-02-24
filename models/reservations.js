@@ -1,8 +1,11 @@
+/**
+ * @file Schéma Mongoose pour la collection "reservations"
+ * @module models/reservations
+ */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 /**
- * Schéma Mongoose pour la collection "reservations"
- * 
  * Il définit la structure de la base de donnée des réservations
  * @typedef {Object} Reservation
  * @property {number} catwayNumber - Le numéro de catway attribué à cette réservation

@@ -1,9 +1,12 @@
+/**
+ * @file Schéma Mongoose pour la collection "catways"
+ * @module models/catways
+ */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 /**
- * Schéma Mongoose pour la collection "catways"
- * 
  * Il définit la structure de la base de donnée des catways
  * @typedef {Object} Catway
  * @property {number} catwayNumber - Le numéro de catway (requis et unique)

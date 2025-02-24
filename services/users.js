@@ -1,3 +1,8 @@
+/**
+ * @file Les différents services de l'API pour la gestion des utilisateurs
+ * @module services/users
+ */
+
 const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -9,7 +14,7 @@ const jwt = require('jsonwebtoken');
  * @param {object} req - Objet de la requête avec les données de l'utilisateur qui souhaite se connecté.
  * @param {object} res - L'objet de réponse Express.
  * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<void>} Répond avec un token JWT si authentification correct, ou une erreur
+ * @returns {Response} Répond avec un token JWT si authentification correct, ou une erreur
  */
 exports.authenticate = async (req, res, next) => {
     const { email, password } = req.body; // On récupère l'email et le password proposé
@@ -88,10 +93,10 @@ const checkPasswordLength = (password) => {
  * Permet de créer un nouvel utilisateur
  * @async
  * @function add
- * @param {Request} req - Objet de la requête avec les données de l'utilisateur à créer.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
+ * @param {object} req - Objet de la requête avec les données de l'utilisateur à créer.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
  */
 exports.add = async (req, res, next) => {
     const temp = ({
@@ -123,10 +128,10 @@ exports.add = async (req, res, next) => {
  * Permet de récupérer tous les utilisateurs.
  * @async
  * @function getAll
- * @param {Request} req - Objet de la requête Express.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec la liste des utilisateurs ou une erreur
+ * @param {object} req - Objet de la requête Express.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la liste des utilisateurs ou une erreur
  */
 exports.getAll = async (req, res, next) => {
     try {
@@ -145,10 +150,10 @@ exports.getAll = async (req, res, next) => {
  * Permet de récupérer les données d'un utilisateur grâce à son adresse email.
  * @async
  * @function getByEmail
- * @param {Request} req - Objet de la requête Express contenant l'email dans les paramètres.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec les données de l'utilisateur ou une erreur
+ * @param {object} req - Objet de la requête Express contenant l'email dans les paramètres.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec les données de l'utilisateur ou une erreur
  */
 exports.getByEmail = async (req, res, next) => {
     const email = req.params.email
@@ -169,10 +174,10 @@ exports.getByEmail = async (req, res, next) => {
  * Met à jour les données d'un utilisateur en l'identifiant par son adresse email.
  * @async
  * @function update
- * @param {Request} req - Objet de la requête Express contenant les nouveaux paramètres à appliquer à l'utilisateur.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON avec les données de l'utilisateur mise à jour ou une erreur
+ * @param {object} req - Objet de la requête Express contenant les nouveaux paramètres à appliquer à l'utilisateur.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec les données de l'utilisateur mise à jour ou une erreur
  */
 exports.update = async (req, res, next) => {
     const email = req.params.email
@@ -206,10 +211,10 @@ exports.update = async (req, res, next) => {
  * Supprime un utilisateur en l'identifiant par son adresse email.
  * @async
  * @function delete
- * @param {Request} req - Objet de la requête Express contenant l'email à supprimer dans les paramètres.
- * @param {Response} res - L'objet de réponse Express.
- * @param {Function} next - La fonction middleware suivante
- * @returns {Promise<Response>} Retourne une réponse JSON ou une erreur
+ * @param {object} req - Objet de la requête Express contenant l'email à supprimer dans les paramètres.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON ou une erreur
  */
 exports.delete = async (req, res, next) => {
     const email = req.params.email

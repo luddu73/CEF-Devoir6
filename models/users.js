@@ -1,10 +1,13 @@
+/**
+ * @file Schéma Mongoose pour la collection "users"
+ * @module models/users
+ */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 
 /**
- * Schéma Mongoose pour la collection "users"
- * 
  * Il définit la structure de la base de donnée utilisateur
  * @typedef {Object} User
  * @property {string} username - Le nom d'utilisateur (requis)
