@@ -1,7 +1,21 @@
+/**
+ * @file Les différents services de l'API pour la gestion des réservations
+ * @module services/reservations
+ */
+
 const Reservation = require('../models/reservations');
 const Catway = require('../models/catways');
 
-// Module qui vérifie l'existance du catway avant les réservations
+
+/**
+ * Module qui vérifie l'existance du catway avant les réservations
+ * @async
+ * @function checkCatwayExists
+ * @param {object} req - Objet de la requête avec le numéro de catway à rechercher.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec une erreur, ou qui valide l'existance du catway
+ */
 exports.checkCatwayExists = async (req, res, next) => {
     
     const id = req.params.id || req.body.catwayNumber;
@@ -21,7 +35,15 @@ exports.checkCatwayExists = async (req, res, next) => {
     }
 }
 
-// Callback qui récupère toutes les réservations
+/**
+ * Permet de récupérer la liste des réservations
+ * @async
+ * @function getAll
+ * @param {object} req - Objet de la requête.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la liste des réservations ou une erreur
+ */
 exports.getAll = async (req, res, next) => {
     try {
         let reservations = await Reservation.find();
@@ -35,7 +57,16 @@ exports.getAll = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-// Callback qui récupère toutes les réservations d'un catway
+
+/**
+ * Permet de récupérer les réservations d'un catway en particulier
+ * @async
+ * @function getByCatway
+ * @param {object} req - Objet de la requête avec le numéro de catway rattaché.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la liste des réservation du catway ou une erreur
+ */
 exports.getByCatway = async (req, res, next) => {
     const id = req.params.id;
 
@@ -51,7 +82,16 @@ exports.getByCatway = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-// Callback qui récupère les infos d'une réservation précise
+
+/**
+ * Permet de récupérer les informations d'une réservation précise
+ * @async
+ * @function getById
+ * @param {object} req - Objet de la requête avec le numéro de réservation à rechercher.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec les données de la réservation ou une erreur
+ */
 exports.getById = async (req, res, next) => {
     const id = req.params.id;
 
@@ -67,7 +107,16 @@ exports.getById = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-// Callback qui récupère les infos d'une réservation précise
+
+/**
+ * Permet de récupérer les infos d'une réservation et d'un catway précis
+ * @async
+ * @function getByIdAndCatway
+ * @param {object} req - Objet de la requête avec les données du catway et de réservation à rechercher.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec les infos de la réservation ou une erreur
+ */
 exports.getByIdAndCatway = async (req, res, next) => {
     const id = req.params.id;
     const idReservation = req.params.idReservation;
@@ -85,7 +134,15 @@ exports.getByIdAndCatway = async (req, res, next) => {
     }
 }
 
-// Fonction qui vérifie si des réservations sont déjà présentes sur un catway
+/**
+ * Fonction qui vérifie si des réservations sont déjà présentes sur un catway
+ * @async
+ * @function checkReservation
+ * @param {number} catwayNumber - Numéro du catway choisi
+ * @param {Date} startDate - Date de début de la réservation souhaitée.
+ * @param {Date} endDate - Date de fin de la réservation souhaitée.
+ * @returns {Response} Retourne une réponse JSON qui indique la présence ou non d'une réservation sur la période choisie ou une erreur
+ */
 const checkReservation = async (catwayNumber, startDate, endDate) => {
     try {
         const presentReservation = await Reservation.findOne({ 
@@ -103,8 +160,15 @@ const checkReservation = async (catwayNumber, startDate, endDate) => {
     }
 }
 
-
-// Callback de création d'une réservation
+/**
+ * Permet de créer une nouvelle réservation
+ * @async
+ * @function add
+ * @param {object} req - Objet de la requête avec les données de la réservation à créer.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la réservation créee ou une erreur
+ */
 exports.add = async (req, res, next) => {
     
     const temp = ({
@@ -132,7 +196,16 @@ exports.add = async (req, res, next) => {
         console.log(error);
     }
 }
-// Callback qui modifier une réservation
+
+/**
+ * Permet de modifier une réservation
+ * @async
+ * @function update
+ * @param {object} req - Objet de la requête avec les données de la réservation à mettre à jour.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la réservation mise à jour ou une erreur
+ */
 exports.update = async (req, res, next) => {
     const idReservation = req.params.idReservation
     const temp = ({
@@ -152,7 +225,7 @@ exports.update = async (req, res, next) => {
         if (presentReservation) {
             return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
         }
-        
+
         let reservation = await Reservation.findOne({_id : idReservation});
 
         if (reservation) {
@@ -171,7 +244,16 @@ exports.update = async (req, res, next) => {
         return res.status(501).json(error)
     } 
 }
-// Callback qui permet de supprimer une réservation
+
+/**
+ * Permet de supprimer une réservation
+ * @async
+ * @function delete
+ * @param {object} req - Objet de la requête avec les données de la réservation à supprimer.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la réservation supprimée ou une erreur
+ */
 exports.delete = async (req, res, next) => {
     const idReservation = req.params.idReservation
 

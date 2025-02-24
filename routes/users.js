@@ -1,3 +1,8 @@
+/**
+ * @file Définition des routes pour la gestion des utilisateurs.
+ * @module routes/users
+ */
+
 var express = require('express');
 var router = express.Router();
 
@@ -6,9 +11,23 @@ const service = require('../services/users');
 // Import du middleware pour privatisation
 // PAS ENCORE UTILISER const private = require('../middlewares/private');
 
-// Route pour lister les utilisateurs
+/**
+ * @route GET /
+ * @description Récupère la liste de tous les utilisateurs.
+ * @group Utilisateurs
+ * @returns {Object} 200 - Liste des utilisateurs.
+ * @returns {Error} 404 - Aucun utilisateur trouvé.
+ */
 router.get('/', service.getAll);
-// Route pour récupérer les infos d'un utilisateur
+
+/**
+ * @route GET /
+ * @description Récupère un utilisateur par son adresse email.
+ * @group Utilisateurs
+ * @param {string} email - Adresse email de l'utilisateur recherché.
+ * @returns {Object} 200 - Liste des utilisateurs.
+ * @returns {Error} 404 - Aucun utilisateur trouvé.
+ */
 router.get('/:email', service.getByEmail);
 // Route pour créer un utilisateur
 router.post('/', service.add);

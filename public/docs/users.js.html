@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: users.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: users.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const User = require('../models/users');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+/**
+ * Permet de créer un nouvel utilisateur
+ * @async
+ * @function authenticate
+ * @param {Request} req - Objet de la requête avec les données de l'utilisateur à créer.
+ * @param {Response} res - L'objet de réponse Express.
+ * @param {Function} next - La fonction middleware suivante
+ * @returns {Promise&lt;Response>} Retourne une réponse JSON qui valide la connexion et créer le token ou une erreur
+ */
+exports.authenticate = async (req, res, next) => {
+    const { email, password } = req.body; // On récupère l'email et le password proposé
+
+    try {
+        let user = await User.findOne({ email: email}, '-__v -createdAt -updatedAt'); // On cherche l'user avec l'email
+
+        if (user) {
+            bcrypt.compare(password, user.password, function(err, response) { // On contrôle le mdp saisie avec la BDD
+                if (err) {
+                    throw new Error(err); // Si faux, on ressort une erreur
+                }
+                if (response) {
+                    delete user._doc.password;
+
+                    const expireIn = 24 * 60 * 60;
+                    const token = jwt.sign({
+                        user: user
+                    },
+                    process.env.SECRET_KEY,
+                    {
+                        expiresIn: expireIn
+                    });
+
+                    res.header('Authorization', 'Bearer ' + token);
+                    
+                    return res.status(200).json('authenticate_succeed');
+                }
+
+                return res.status(403).json('wrong_credentials');
+            });
+        } else {
+            return res.status(404).json('user_not_found');
+        }
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+
+/**
+ * Vérifie la présentation de l'email
+ * @async
+ * @function checkEmail
+ * @param {string} email - L'email à vérifier
+ * @returns Retourne une réponse JSON qui indique où non si l'email passe le test de présentation
+ */
+const checkEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
+// Création d'une fonction qui vérifie et valide la sécurité du mot de passe
+const checkPassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]+$/;
+    return passwordRegex.test(password);
+};
+// Création d'une fonction qui vérifie et valide la longueur du mot de passe
+const checkPasswordLength = (password) => {
+    return password.length >= 8;
+};
+/**
+ * Permet de créer un nouvel utilisateur
+ * @async
+ * @function add
+ * @param {Request} req - Objet de la requête avec les données de l'utilisateur à créer.
+ * @param {Response} res - L'objet de réponse Express.
+ * @param {Function} next - La fonction middleware suivante
+ * @returns {Promise&lt;Response>} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
+ */
+exports.add = async (req, res, next) => {
+    /**
+     * @typedef {Object} UserData
+     * @property {string} username - le nom de l'utilisateur
+     * @property {string} email - l'adresse email de l'utilisateur
+     * @property {string} password - le mot de passe de l'utilisateur
+     * 
+     * @type {UserData
+     */
+    const temp = ({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    if (!checkEmail(temp.email)) {
+        return res.status(400).json({ error: "Adresse email invalide."});
+    }
+    if (!checkPassword(temp.password)) {
+        return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+    }
+    if (!checkPasswordLength(temp.password)) {
+        return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+    }
+
+    try {
+        let user = await User.create(temp);
+
+        return res.status(201).json(user);
+    } catch (error) {
+        return res.status(501).json(error)
+    }
+}
+
+// Callback qui récupère tout les utilisateurs
+exports.getAll = async (req, res, next) => {
+    try {
+        let users = await User.find();
+
+        if (users) {
+            return res.status(200).json(users);
+        }
+
+        return res.status(404).json('Aucun utilisateur trouvé');
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+// Callback qui récupère les informations selon un email
+exports.getByEmail = async (req, res, next) => {
+    const email = req.params.email
+
+    try {
+        let user = await User.findOne({ email });
+
+        if (user) {
+            return res.status(200).json(user);
+        }
+
+        return res.status(404).json('Utilisateur non trouvé');
+    } catch (error) {
+        return res.status(501).json(error);
+    }
+}
+// Callback qui modifier un utilisateur
+exports.update = async (req, res, next) => {
+    const email = req.params.email
+    const temp = ({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    try {
+        let user = await User.findOne({email : email});
+
+        if (user) {
+            Object.keys(temp).forEach((key) => {
+                if (!!temp[key]) {
+                    user[key] = temp[key];
+                }
+            });
+
+            await user.save();
+            return res.status(201).json(user);
+        }
+
+        return res.status(404).json('Utilisateur non trouvé');
+    } catch (error) {
+        return res.status(501).json(error)
+    } 
+}
+// Callback qui permet de supprimer un utilisateur
+exports.delete = async (req, res, next) => {
+    const email = req.params.email
+
+    try {
+        await User.deleteOne({email : email});
+
+        return res.status(204).json('Utilisateur supprimé');
+    } catch (error) {
+        return res.status(501).json(error)
+    } 
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#add">add</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkEmail">checkEmail</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Feb 23 2025 22:32:13 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,7 +1,21 @@
+/**
+ * @file Les différents services de l'API pour la gestion des utilisateurs
+ * @module services/users
+ */
+
 const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+/**
+ * Authentifie un utilisateur en vérifiant l'email et le mot de passe
+ * @async
+ * @function authenticate
+ * @param {object} req - Objet de la requête avec les données de l'utilisateur qui souhaite se connecté.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {Function} next - La fonction middleware suivante
+ * @returns {Response} Répond avec un token JWT si authentification correct, ou une erreur
+ */
 exports.authenticate = async (req, res, next) => {
     const { email, password } = req.body; // On récupère l'email et le password proposé
 
@@ -40,24 +54,51 @@ exports.authenticate = async (req, res, next) => {
     }
 }
 
-// Création d'une fonction pour valider la présentation de l'email 
+/**
+ * Vérifie la présentation de l'email
+ * @async
+ * @function checkEmail
+ * @param {string} email - L'email à vérifier
+ * @returns {boolean} Retourne une réponse "true" si l'email est conforme, sinon "false"
+ */
 const checkEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 };
-// Création d'une fonction qui vérifie et valide la sécurité du mot de passe
+
+/**
+ * Vérifie la sécurité du mot de passe (1 majuscule, 1 miniscule, 1 chiffre et 1 caractère spécial)
+ * @async
+ * @function checkPassword
+ * @param {string} password - Le mot de passe à vérifier
+ * @returns {boolean} Retourne une réponse "true" si le mot de passe est conforme, sinon "false"
+ */
 const checkPassword = (password) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
     return passwordRegex.test(password);
 };
-// Création d'une fonction qui vérifie et valide la longueur du mot de passe
+
+/**
+ * Vérifie la longueur du mot de passe (8 caractères minimum)
+ * @async
+ * @function checkPasswordLength
+ * @param {string} password - Le mot de passe à vérifier
+ * @returns {boolean} Retourne une réponse "true" si le mot de passe est conforme, sinon "false"
+ */
 const checkPasswordLength = (password) => {
     return password.length >= 8;
 };
 
-// Callback de création d'un utilisateur
+/**
+ * Permet de créer un nouvel utilisateur
+ * @async
+ * @function add
+ * @param {object} req - Objet de la requête avec les données de l'utilisateur à créer.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
+ */
 exports.add = async (req, res, next) => {
-
     const temp = ({
         username: req.body.username,
         email: req.body.email,
@@ -83,7 +124,15 @@ exports.add = async (req, res, next) => {
     }
 }
 
-// Callback qui récupère tout les utilisateurs
+/**
+ * Permet de récupérer tous les utilisateurs.
+ * @async
+ * @function getAll
+ * @param {object} req - Objet de la requête Express.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec la liste des utilisateurs ou une erreur
+ */
 exports.getAll = async (req, res, next) => {
     try {
         let users = await User.find();
@@ -97,7 +146,15 @@ exports.getAll = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-// Callback qui récupère les informations selon un email
+/**
+ * Permet de récupérer les données d'un utilisateur grâce à son adresse email.
+ * @async
+ * @function getByEmail
+ * @param {object} req - Objet de la requête Express contenant l'email dans les paramètres.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec les données de l'utilisateur ou une erreur
+ */
 exports.getByEmail = async (req, res, next) => {
     const email = req.params.email
 
@@ -113,7 +170,15 @@ exports.getByEmail = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
-// Callback qui modifier un utilisateur
+/**
+ * Met à jour les données d'un utilisateur en l'identifiant par son adresse email.
+ * @async
+ * @function update
+ * @param {object} req - Objet de la requête Express contenant les nouveaux paramètres à appliquer à l'utilisateur.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec les données de l'utilisateur mise à jour ou une erreur
+ */
 exports.update = async (req, res, next) => {
     const email = req.params.email
     const temp = ({
@@ -141,7 +206,16 @@ exports.update = async (req, res, next) => {
         return res.status(501).json(error)
     } 
 }
-// Callback qui permet de supprimer un utilisateur
+
+/**
+ * Supprime un utilisateur en l'identifiant par son adresse email.
+ * @async
+ * @function delete
+ * @param {object} req - Objet de la requête Express contenant l'email à supprimer dans les paramètres.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON ou une erreur
+ */
 exports.delete = async (req, res, next) => {
     const email = req.params.email
 

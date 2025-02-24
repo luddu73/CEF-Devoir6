@@ -1,8 +1,23 @@
+/**
+ * @file Middleware pour vérifier et refraîchir un token JWT.
+ * @module middlewares/private
+ */
+
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.SECRET_KEY;
 
+/**
+ * Vérifie l'existance et la validité du token JWT dans l'header des requêtes
+ * - Si le token est valide, il est décodé et rattaché à req.decoded
+ * - On créer un nouveau token renvoyé dans l'header "Authorization" pour continuer la session
+ * @param {object} req - Objet de la requête Express
+ * @param {object} res - Objet de réponse Express
+ * @param {function} next - Fonction suivante
+ * @returns {response} Renvoi un 404 en cas d'échec, sinon on passe à la fonction suivante.
+ */
 exports.checkJWT = async (req, res, next) => {
     let token = req.headers['x-access-token'] || req.headers['authorization'];
+    // On vérifie que le token commence par 'Bearer '
     if (!!token && token.startsWith('Bearer ')) {
         token = token.slice(7, token.length);
     }
@@ -14,6 +29,7 @@ exports.checkJWT = async (req, res, next) => {
             } else {
                 req.decoded = decoded;
 
+                // Génération d'un token pour continuer notre session
                 const expiresIn = 24 * 60 * 60;
                 const newToken = jwt.sign({
                     user : decoded.user
@@ -23,6 +39,7 @@ exports.checkJWT = async (req, res, next) => {
                     expiresIn: expiresIn
                 });
 
+                // Ajout du token crée dans l'header
                 res.header('Authorization', 'Bearer ' + newToken);
                 next();
             }

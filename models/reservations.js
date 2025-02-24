@@ -1,5 +1,19 @@
+/**
+ * @file Schéma Mongoose pour la collection "reservations"
+ * @module models/reservations
+ */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+/**
+ * Il définit la structure de la base de donnée des réservations
+ * @typedef {Object} Reservation
+ * @property {number} catwayNumber - Le numéro de catway attribué à cette réservation
+ * @property {string} clientName - Le nom du client pour qui le catway est réservé
+ * @property {string} boatName - Le nom du bâteau du client pour qui le catway est réservé
+ * @property {Date} startDate - Date de début de la réservation
+ * @property {Date} endDate - Date de fin de la réservation
+ */
 
 const Reservation = new Schema({
     catwayNumber: {

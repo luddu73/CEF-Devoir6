@@ -5,7 +5,8 @@
   "scripts": {
     "start": "env-cmd -f ./env/.env nodemon ./bin/www",
     "dev": "env-cmd -f ./env/.env.dev nodemon ./bin/www",
-    "prod": "env-cmd -f ./env/.env.prod nodemon ./bin/www"
+    "prod": "env-cmd -f ./env/.env.prod nodemon ./bin/www",
+    "doc": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -16,6 +17,7 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "jsdoc": "^4.0.4",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.0",
     "morgan": "~1.9.1",
