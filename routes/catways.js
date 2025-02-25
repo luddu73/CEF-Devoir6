@@ -160,21 +160,12 @@ router.post('/', private.checkJWT, service.add);
  *           schema:
  *             type: object
  *             properties:
- *               number:
- *                 type: number
- *                 example: 1
- *               type:
- *                 type: string
- *                 enum: [long, short]
- *                 example: "long"
  *               state:
  *                 type: string
  *                 example: "Quelques fissures sur le quai"
  *     responses:
  *       201:
  *         description: "Catway modifié avec succès."
- *       400:
- *         description: "Le type doit être court ou long."
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
  *       404:
@@ -202,6 +193,8 @@ router.put('/:id', private.checkJWT, service.update);
  *     responses:
  *       204:
  *         description: "Catway supprimé avec succès."
+ *       404:
+ *          description: "Catway non trouvé."
  *       501:
  *         description: "Erreur serveur."
  */
@@ -252,7 +245,7 @@ router.delete('/:id', private.checkJWT, service.delete);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id/reservations', private.checkJWT, serviceReservation.getByCatway);
+router.get('/:id/reservations', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.getByCatway);
 
 /**
  * @swagger
@@ -274,7 +267,7 @@ router.get('/:id/reservations', private.checkJWT, serviceReservation.getByCatway
  *         required: true
  *         description: "ID de la réservation recherchée."
  *         schema:
- *           type: number
+ *           type: string
  *     responses:
  *       200:
  *         description: "Réservation récupérée avec succès."
@@ -304,7 +297,7 @@ router.get('/:id/reservations', private.checkJWT, serviceReservation.getByCatway
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.getByIdAndCatway);
+router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.checkReservationCatwayExists, serviceReservation.getById);
 
 /**
  * @swagger
@@ -354,6 +347,8 @@ router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservat
  *         description: "Mauvaise requête (erreur dans les dates ou réservation déjà présente sur le créneau choisi)."
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
+ *       404:
+ *          description: "Catway non trouvé"
  *       501:
  *         description: "Erreur serveur."
  */
@@ -379,7 +374,7 @@ router.post('/:id/reservations', private.checkJWT, serviceReservation.checkCatwa
  *         required: true
  *         description: "ID de la réservation recherchée."
  *         schema:
- *           type: number
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -416,7 +411,7 @@ router.post('/:id/reservations', private.checkJWT, serviceReservation.checkCatwa
  *       501:
  *         description: "Erreur serveur."
  */
-router.put('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.update);
+router.put('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.checkReservationCatwayExists, serviceReservation.update);
 /**
  * @swagger
  * /catways/{id}/reservations/{idReservation}:
@@ -437,16 +432,20 @@ router.put('/:id/reservations/:idReservation', private.checkJWT, serviceReservat
  *         required: true
  *         description: "ID de la réservation recherchée."
  *         schema:
- *           type: number
+ *           type: string
  *     responses:
  *       204:
  *         description: "Réservation supprimée avec succès."
+ *       400:
+ *          description: "L'id de réservation n'est pas valide"
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
+ *       404:
+ *          description: "La réservation ou le catway n'a pas été trouvé."
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.delete);
+router.delete('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.checkReservationCatwayExists, serviceReservation.delete);
 
 
 

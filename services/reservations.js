@@ -5,6 +5,7 @@
 
 const Reservation = require('../models/reservations');
 const Catway = require('../models/catways');
+const mongoose = require('mongoose');
 
 
 /**
@@ -34,6 +35,75 @@ exports.checkCatwayExists = async (req, res, next) => {
         return res.status(501).json(error);
     }
 }
+/**
+ * Module qui vérifie l'existance d'une réservation sur un catway
+ * @async
+ * @function checkCatwayExists
+ * @param {object} req - Objet de la requête avec le numéro de réservation et de catway à rechercher.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec une erreur, ou qui valide l'existance de la réservation sur le catway choisi
+ */
+exports.checkReservationCatwayExists = async (req, res, next) => {
+    
+    const id = req.params.id || req.body.catwayNumber;
+    const objectIdReservation = req.params.idReservation;
+    if (!mongoose.Types.ObjectId.isValid(objectIdReservation)) {
+        return res.status(400).json({ error: "L'id Reservation est invalide." });
+    }
+
+    try {
+        const idReservation = new mongoose.Types.ObjectId(objectIdReservation);
+
+        const reservation = await Reservation.findOne({ catwayNumber: id, _id: idReservation });
+
+        if (!reservation) {
+            return res.status(404).json('Réservation non trouvée sur ce catway');
+        }
+
+        req.reservation = reservation;
+        next();
+    }
+    catch (error) {
+        return res.status(501).json(error);
+    }
+}
+/**
+ * Module qui vérifie l'existance d'une réservation
+ * @async
+ * @function checkCatwayExists
+ * @param {object} req - Objet de la requête avec le numéro de réservation à rechercher.
+ * @param {object} res - L'objet de réponse Express.
+ * @param {function} next - La fonction middleware suivante
+ * @returns {Response} Retourne une réponse JSON avec une erreur, ou qui valide l'existance de la réservation
+ */
+exports.checkReservationExists = async (req, res, next) => {
+    
+    const objectIdReservation = req.params.idReservation;
+    console.log("Paramètre reçu :", req.params.idReservation);
+    if (!mongoose.Types.ObjectId.isValid(objectIdReservation)) {
+        return res.status(400).json({ error: "L'id Reservation est invalide." });
+    }
+
+    try {
+        const idReservation = new mongoose.Types.ObjectId(objectIdReservation);
+
+        const reservation = await Reservation.findOne({ _id: idReservation });
+
+        if (!reservation) {
+            return res.status(404).json('Réservation non trouvée');
+        }
+
+        req.reservation = reservation;
+        next();
+    }
+    catch (error) {
+        return res.status(501).json(error);
+    }
+}
+
+
+
 
 /**
  * Permet de récupérer la liste des réservations
@@ -48,7 +118,7 @@ exports.getAll = async (req, res, next) => {
     try {
         let reservations = await Reservation.find();
 
-        if (reservations) {
+        if (reservations.length > 0) {
             return res.status(200).json(reservations);
         }
 
@@ -73,11 +143,11 @@ exports.getByCatway = async (req, res, next) => {
     try {
         let reservations = await Reservation.find({ catwayNumber: id });
 
-        if (reservations) {
+        if (reservations.length > 0) {
             return res.status(200).json(reservations);
         }
 
-        return res.status(405).json('Aucune réservation trouvée pour ce catway');
+        return res.status(404).json('Aucune réservation trouvée pour ce catway');
     } catch (error) {
         return res.status(501).json(error);
     }
@@ -93,38 +163,14 @@ exports.getByCatway = async (req, res, next) => {
  * @returns {Response} Retourne une réponse JSON avec les données de la réservation ou une erreur
  */
 exports.getById = async (req, res, next) => {
-    const id = req.params.id;
-
-    try {
-        let reservations = await Reservation.findById(id);
-
-        if (reservations) {
-            return res.status(200).json(reservations);
-        }
-
-        return res.status(404).json('Aucune réservation trouvée');
-    } catch (error) {
-        return res.status(501).json(error);
-    }
-}
-
-/**
- * Permet de récupérer les infos d'une réservation et d'un catway précis
- * @async
- * @function getByIdAndCatway
- * @param {object} req - Objet de la requête avec les données du catway et de réservation à rechercher.
- * @param {object} res - L'objet de réponse Express.
- * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec les infos de la réservation ou une erreur
- */
-exports.getByIdAndCatway = async (req, res, next) => {
-    const id = req.params.id;
     const idReservation = req.params.idReservation;
-
     try {
-        let reservations = await Reservation.find({ catwayNumber: id, _id: idReservation });
+        
+        const idReservation = new mongoose.Types.ObjectId(req.params.idReservation);
 
-        if (reservations) {
+        let reservations = await Reservation.find({ _id: idReservation });
+
+        if (reservations.length > 0) {
             return res.status(200).json(reservations);
         }
 
@@ -179,7 +225,18 @@ exports.add = async (req, res, next) => {
         endDate: req.body.endDate
     });
 
-    if (temp.startDate > temp.endDate) {
+    let DateDebut = new Date(temp.startDate);
+    let DateFin = new Date(temp.endDate);
+    let DateAct = new Date();
+    
+    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
+    {
+        return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+    }
+    if (DateDebut <= DateAct) {
+        return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+    }
+    if (DateDebut > DateFin) {
         return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
@@ -193,7 +250,6 @@ exports.add = async (req, res, next) => {
         return res.status(201).json(reservation);
     } catch (error) {
         return res.status(501).json(error);
-        console.log(error);
     }
 }
 
@@ -207,7 +263,10 @@ exports.add = async (req, res, next) => {
  * @returns {Response} Retourne une réponse JSON avec la réservation mise à jour ou une erreur
  */
 exports.update = async (req, res, next) => {
-    const idReservation = req.params.idReservation
+    const idReservation = req.params.idReservation;
+    if (!mongoose.Types.ObjectId.isValid(idReservation)) {
+        return res.status(400).json({ error: 'L\'id Reservation est invalide.' });
+    }
     const temp = ({
         catwayNumber: req.params.id || req.body.catwayNumber,
         clientName: req.body.clientName,
@@ -216,15 +275,29 @@ exports.update = async (req, res, next) => {
         endDate: req.body.endDate
     });
 
-    if (temp.startDate > temp.endDate) {
+    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
+    {
+        return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+    }
+
+    let DateDebut = new Date(temp.startDate);
+    let DateFin = new Date(temp.endDate);
+    let DateAct = new Date();
+    
+    if (DateDebut <= DateAct) {
+        return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+    }
+    if (DateDebut > DateFin) {
         return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
+    const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
+    if (presentReservation) {
+        return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+    }
+
     try {
-        const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
-        if (presentReservation) {
-            return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
-        }
+        const idReservation = new mongoose.Types.ObjectId(req.params.idReservation);
 
         let reservation = await Reservation.findOne({_id : idReservation});
 

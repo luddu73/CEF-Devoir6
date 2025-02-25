@@ -105,6 +105,10 @@ exports.add = async (req, res, next) => {
         password: req.body.password
     });
 
+    if (!temp.username)
+    {
+        return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+    }
     if (!checkEmail(temp.email)) {
         return res.status(400).json({ error: "Adresse email invalide."});
     }
@@ -137,7 +141,7 @@ exports.getAll = async (req, res, next) => {
     try {
         let users = await User.find();
 
-        if (users) {
+        if (users.length > 0) {
             return res.status(200).json(users);
         }
 
@@ -187,6 +191,10 @@ exports.update = async (req, res, next) => {
         password: req.body.password
     });
 
+    if (!temp.username)
+    {
+        return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+    }
     if (!checkEmail(temp.email)) {
         return res.status(400).json({ error: "Adresse email invalide."});
     }
@@ -230,9 +238,14 @@ exports.delete = async (req, res, next) => {
     const email = req.params.email
 
     try {
-        await User.deleteOne({email : email});
+        let user = await User.findOne({ email: email });
+        
+        if (user) {
+            await User.deleteOne({email: email});
+            return res.status(200).json('Utilisateur supprimé');
+        }
+        return res.status(404).json('Utilisateur non trouvé');
 
-        return res.status(204).json('Utilisateur supprimé');
     } catch (error) {
         return res.status(501).json(error)
     } 
