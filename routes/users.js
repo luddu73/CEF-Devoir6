@@ -11,7 +11,7 @@ var router = express.Router();
 const service = require('../services/users');
 
 // Import du middleware pour privatisation
-// PAS ENCORE UTILISER const private = require('../middlewares/private');
+const private = require('../middlewares/private');
 
 /**
  * @swagger
@@ -37,12 +37,14 @@ const service = require('../services/users');
  *                     type: string
  *                   role:
  *                     type: string
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Aucun utilisateur trouvé"
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', service.getAll);
+router.get('/', private.checkJWT, service.getAll);
 
 
 /**
@@ -76,12 +78,14 @@ router.get('/', service.getAll);
  *                     type: string
  *                   password:
  *                     type: string
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *         description: "Utilisateur non trouvé."
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:email', service.getByEmail);
+router.get('/:email', private.checkJWT, service.getByEmail);
 
 /**
  * @swagger
@@ -116,12 +120,14 @@ router.get('/:email', service.getByEmail);
  *     responses:
  *       201:
  *         description: "Utilisateur créé avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       400:
  *         description: "Mauvaise requête (email ou mot de passe invalide)."
  *       501:
  *         description: "Erreur serveur."
  */
-router.post('/', service.add);
+router.post('/', private.checkJWT, service.add);
 
 /**
  * @swagger
@@ -159,6 +165,8 @@ router.post('/', service.add);
  *     responses:
  *       201:
  *         description: "Utilisateur modifié avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       400:
  *         description: "Mauvaise requête (email ou mot de passe invalide)."
  *       404:
@@ -166,7 +174,7 @@ router.post('/', service.add);
  *       501:
  *         description: "Erreur serveur."
  */
-router.put('/:email', service.update);
+router.put('/:email', private.checkJWT, service.update);
 
 /**
  * @swagger
@@ -186,10 +194,12 @@ router.put('/:email', service.update);
  *     responses:
  *       204:
  *         description: "Utilisateur supprimé."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:email', service.delete);
+router.delete('/:email', private.checkJWT, service.delete);
 
 
 /**
@@ -227,9 +237,9 @@ router.delete('/:email', service.delete);
  *             schema:
  *               type: string
  *       403:
- *         description: "Identifiants incorrects"
+ *         description: "Mot de passe incorrect"
  *       404:
- *         description: "Utilisateur non trouvé"
+ *         description: "Utilisateur inexistant"
  *       501:
  *         description: "Erreur serveur"
  */
