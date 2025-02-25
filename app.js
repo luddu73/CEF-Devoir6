@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var { swaggerUi, swaggerDocs, swaggerUiOptions } = require("./swaggerConfig");
+var cors = require('cors'); // Pour sécurisé la réception des données sur l'API
 
 var mongodb = require('./db/mongo');
 
@@ -15,6 +16,24 @@ var reservationsRouter = require('./routes/reservations');
 mongodb.initClientDbConnection();
 
 var app = express();
+
+if (process.env.NODE_ENV !== "production") {
+  app.use(cors());
+} else {
+  // Je n'autorise que depuis mon URL d'API l'envoi de données sur celle-ci
+  const corsOptions = {
+    origin: "http://localhost", // Permet uniquement ce frontend en développement
+    methods: ["GET", "POST", "PUT", "DELETE"], // Liste des méthodes autorisées
+    allowedHeaders: ["Content-Type", "Authorization"], // Headers autorisés
+    credentials: true, // Autorise l'envoi de cookies/token en production
+  };
+  app.use(cors(corsOptions));
+}
+console.log(process.env.NODE_ENV);
+/*app.use((req, res, next) => {
+  console.log('Origin:', req.headers.origin);  // Log l'origin de chaque requête
+  next();
+});*/
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -44,7 +44,7 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, service.getAll);
+router.get('/', service.getAll);
 
 
 /**
