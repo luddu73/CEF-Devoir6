@@ -18,7 +18,7 @@ exports.getAll = async (req, res, next) => {
     try {
         let catways = await Catway.find();
 
-        if (catways) {
+        if (catways.length > 0) {
             return res.status(200).json(catways);
         }
 
@@ -73,6 +73,10 @@ exports.add = async (req, res, next) => {
     if (temp.catwayType !== "short" && temp.catwayType !== "long") {
         return res.status(400).json({ error: "Le type doit être court ou long."});
     }
+    let catwayExist = await Catway.findOne({ catwayNumber: temp.catwayNumber });
+    if (catwayExist) {
+        return res.status(400).json({error: "Ce catway existe déjà."});
+    }
 
     try {
         let catway = await Catway.create(temp);
@@ -97,11 +101,6 @@ exports.update = async (req, res, next) => {
     const temp = ({
         catwayState: req.body.state
     });
-    
-    if (temp.catwayType !== "short" && temp.catwayType !== "long") {
-        return res.status(400).json({ error: "Le type doit être court ou long."});
-    }
-
 
     try {
         let catway = await Catway.findOne({catwayNumber : id});
@@ -136,9 +135,13 @@ exports.delete = async (req, res, next) => {
     const id = req.params.id
 
     try {
-        await Catway.deleteOne({catwayNumber : id});
+        let catway = await Catway.findOne({ catwayNumber: id });
 
-        return res.status(204).json('Catway supprimé');
+        if (catway) {
+            await Catway.deleteOne({catwayNumber: id});
+            return res.status(200).json('Catway supprimé');
+        }
+        return res.status(404).json('Catway non trouvé');
     } catch (error) {
         return res.status(501).json(error)
     } 

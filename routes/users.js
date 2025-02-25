@@ -44,7 +44,7 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, service.getAll);
+router.get('/', service.getAll);
 
 
 /**
@@ -196,6 +196,8 @@ router.put('/:email', private.checkJWT, service.update);
  *         description: "Utilisateur supprimé."
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
+ *       404:
+ *          description: "Utilisateur non trouvé"
  *       501:
  *         description: "Erreur serveur."
  */

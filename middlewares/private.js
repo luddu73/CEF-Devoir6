@@ -30,7 +30,7 @@ exports.checkJWT = async (req, res, next) => {
                 req.decoded = decoded;
 
                 // Génération d'un token pour continuer notre session
-                const expiresIn = 24 * 60 * 60;
+                const expiresIn = process.env.JWT_EXPIRE * 60 * 60;
                 const newToken = jwt.sign({
                     user : decoded.user
                 },
