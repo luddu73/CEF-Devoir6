@@ -41,13 +41,13 @@ exports.authenticate = async (req, res, next) => {
 
                     res.header('Authorization', 'Bearer ' + token);
                     
-                    return res.status(200).json('authenticate_succeed');
+                    return res.status(200).json('Authentification réussie');
                 }
 
-                return res.status(403).json('wrong_credentials');
+                return res.status(403).json('Mot de passe incorrect');
             });
         } else {
-            return res.status(404).json('user_not_found');
+            return res.status(404).json('Utilisateur inexistant');
         }
     } catch (error) {
         return res.status(501).json(error);

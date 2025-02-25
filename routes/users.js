@@ -37,6 +37,8 @@ const private = require('../middlewares/private');
  *                     type: string
  *                   role:
  *                     type: string
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Aucun utilisateur trouvé"
  *       501:
@@ -76,6 +78,8 @@ router.get('/', private.checkJWT, service.getAll);
  *                     type: string
  *                   password:
  *                     type: string
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *         description: "Utilisateur non trouvé."
  *       501:
@@ -116,6 +120,8 @@ router.get('/:email', private.checkJWT, service.getByEmail);
  *     responses:
  *       201:
  *         description: "Utilisateur créé avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       400:
  *         description: "Mauvaise requête (email ou mot de passe invalide)."
  *       501:
@@ -159,6 +165,8 @@ router.post('/', private.checkJWT, service.add);
  *     responses:
  *       201:
  *         description: "Utilisateur modifié avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       400:
  *         description: "Mauvaise requête (email ou mot de passe invalide)."
  *       404:
@@ -186,6 +194,8 @@ router.put('/:email', private.checkJWT, service.update);
  *     responses:
  *       204:
  *         description: "Utilisateur supprimé."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       501:
  *         description: "Erreur serveur."
  */
@@ -227,9 +237,9 @@ router.delete('/:email', private.checkJWT, service.delete);
  *             schema:
  *               type: string
  *       403:
- *         description: "Identifiants incorrects"
+ *         description: "Mot de passe incorrect"
  *       404:
- *         description: "Utilisateur non trouvé"
+ *         description: "Utilisateur inexistant"
  *       501:
  *         description: "Erreur serveur"
  */

@@ -46,6 +46,8 @@ const private = require('../middlewares/private');
  *                     enum: [long, short]
  *                   catwayState:
  *                     type: string
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Aucun catway trouvé"
  *       501:
@@ -86,6 +88,8 @@ router.get('/', private.checkJWT, service.getAll);
  *                     enum: [long, short]
  *                   catwayState:
  *                     type: string
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Catway non trouvé"
  *       501:
@@ -125,6 +129,8 @@ router.get('/:id', private.checkJWT, service.getById);
  *     responses:
  *       201:
  *         description: "Catway créé avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       400:
  *         description: "Le type doit être court ou long."
  *       501:
@@ -169,6 +175,8 @@ router.post('/', private.checkJWT, service.add);
  *         description: "Catway modifié avec succès."
  *       400:
  *         description: "Le type doit être court ou long."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *         description: "Catway non trouvé."
  *       501:
@@ -237,6 +245,8 @@ router.delete('/:id', private.checkJWT, service.delete);
  *                   endDate:
  *                     type: string
  *                     format: date
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Catway non trouvé ou aucune réservation trouvée sur ce catway"
  *       501:
@@ -287,6 +297,8 @@ router.get('/:id/reservations', private.checkJWT, serviceReservation.getByCatway
  *                   endDate:
  *                     type: string
  *                     format: date
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Catway non trouvé ou aucune réservation trouvée"
  *       501:
@@ -340,6 +352,8 @@ router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservat
  *         description: "Réservation créé avec succès."
  *       400:
  *         description: "Mauvaise requête (erreur dans les dates ou réservation déjà présente sur le créneau choisi)."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       501:
  *         description: "Erreur serveur."
  */
@@ -395,6 +409,8 @@ router.post('/:id/reservations', private.checkJWT, serviceReservation.checkCatwa
  *         description: "Réservation modifiée avec succès."
  *       400:
  *         description: "Mauvaise requête (erreur dans les dates ou réservation déjà présente sur le créneau choisi)."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *         description: "Réservation non trouvée"
  *       501:
@@ -425,6 +441,8 @@ router.put('/:id/reservations/:idReservation', private.checkJWT, serviceReservat
  *     responses:
  *       204:
  *         description: "Réservation supprimée avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       501:
  *         description: "Erreur serveur."
  */

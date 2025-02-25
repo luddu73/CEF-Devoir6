@@ -36,6 +36,8 @@ const private = require('../middlewares/private');
  *                   endDate:
  *                     type: string
  *                     format: date
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Aucune réservation trouvée"
  *       501:
@@ -80,6 +82,8 @@ router.get('/', private.checkJWT, serviceReservation.getAll);
  *                   endDate:
  *                     type: string
  *                     format: date
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Catway non trouvé ou aucune réservation trouvée"
  *       501:
@@ -130,6 +134,8 @@ router.get('/:id', private.checkJWT, serviceReservation.getById);
  *         description: "Réservation créé avec succès."
  *       400:
  *         description: "Mauvaise requête (erreur dans les dates ou réservation déjà présente sur le créneau choisi)."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       501:
  *         description: "Erreur serveur."
  */
@@ -179,6 +185,8 @@ router.post('/', private.checkJWT, serviceReservation.checkCatwayExists, service
  *         description: "Réservation modifiée avec succès."
  *       400:
  *         description: "Mauvaise requête (erreur dans les dates ou réservation déjà présente sur le créneau choisi)."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *         description: "Réservation non trouvée"
  *       501:
@@ -204,6 +212,8 @@ router.put('/:idReservation', private.checkJWT, serviceReservation.checkCatwayEx
  *     responses:
  *       204:
  *         description: "Réservation supprimée avec succès."
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
  *       501:
  *         description: "Erreur serveur."
  */
