@@ -79,5 +79,6 @@ const Reservation = new Schema({
     }
 });
 
+Reservation.index({ catwatNumber: 1 });  // On créer un index pour améliorer les performances, car on recherche souvent par catway. 1 signifie croissant.
 
 module.exports = mongoose.model('reservations', Reservation);
