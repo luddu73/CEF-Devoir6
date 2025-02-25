@@ -30,7 +30,7 @@ exports.authenticate = async (req, res, next) => {
                 if (response) {
                     delete user._doc.password;
 
-                    const expireIn = 24 * 60 * 60;
+                    const expireIn = process.env.JWT_EXPIRE * 60 * 60;
                     const token = jwt.sign({
                         user: user
                     },
