@@ -19,7 +19,7 @@ const service = require('../services/catways');
 const serviceReservation = require('../services/reservations');
 
 // Import du middleware pour privatisation
-// PAS ENCORE UTILISER const private = require('../middlewares/private');
+const private = require('../middlewares/private');
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ const serviceReservation = require('../services/reservations');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', service.getAll);
+router.get('/', private.checkJWT, service.getAll);
 
 
 /**
@@ -91,7 +91,7 @@ router.get('/', service.getAll);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id', service.getById);
+router.get('/:id', private.checkJWT, service.getById);
 
 /**
  * @swagger
@@ -130,7 +130,7 @@ router.get('/:id', service.getById);
  *       501:
  *         description: "Erreur serveur."
  */
-router.post('/', service.add);
+router.post('/', private.checkJWT, service.add);
 
 /**
  * @swagger
@@ -174,7 +174,7 @@ router.post('/', service.add);
  *       501:
  *         description: "Erreur serveur."
  */
-router.put('/:id', service.update);
+router.put('/:id', private.checkJWT, service.update);
 
 /**
  * @swagger
@@ -197,7 +197,7 @@ router.put('/:id', service.update);
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:id', service.delete);
+router.delete('/:id', private.checkJWT, service.delete);
 
 
 /**
@@ -242,7 +242,7 @@ router.delete('/:id', service.delete);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id/reservations', serviceReservation.getByCatway);
+router.get('/:id/reservations', private.checkJWT, serviceReservation.getByCatway);
 
 /**
  * @swagger
@@ -292,7 +292,7 @@ router.get('/:id/reservations', serviceReservation.getByCatway);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id/reservations/:idReservation', serviceReservation.getByIdAndCatway);
+router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.getByIdAndCatway);
 
 /**
  * @swagger
@@ -343,7 +343,7 @@ router.get('/:id/reservations/:idReservation', serviceReservation.getByIdAndCatw
  *       501:
  *         description: "Erreur serveur."
  */
-router.post('/:id/reservations', serviceReservation.checkCatwayExists, serviceReservation.add);
+router.post('/:id/reservations', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.add);
 
 /**
  * @swagger
@@ -400,7 +400,7 @@ router.post('/:id/reservations', serviceReservation.checkCatwayExists, serviceRe
  *       501:
  *         description: "Erreur serveur."
  */
-router.put('/:id/reservations/:idReservation', serviceReservation.checkCatwayExists, serviceReservation.update);
+router.put('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.update);
 /**
  * @swagger
  * /catways/{id}/reservations/{idReservation}:
@@ -428,7 +428,7 @@ router.put('/:id/reservations/:idReservation', serviceReservation.checkCatwayExi
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:id/reservations/:idReservation', serviceReservation.checkCatwayExists, serviceReservation.delete);
+router.delete('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.delete);
 
 
 

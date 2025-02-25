@@ -10,13 +10,34 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "Documentation de l'API pour gérer les réservations du port de plaisance de Russell" 
     },
+    components: {
+        securitySchemes: {
+            bearerAuth: { // Définition du système d'authentification
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT"
+            }
+        }
+    },
+    security: [{ bearerAuth: [] }], // Appliquer l’auth sur toutes les routes
+    servers: [
+        {
+            url: "http://localhost:3000",
+            description: "Serveur de développement"
+        },
+        {
+            url: "...",
+            description: "Serveur de production"
+        }
+    ]
   },
-  apis: ["./routes/*.js", "./middlewares/*.js","./models/*.js","./services/*.js"], 
+  apis: ["./routes/*.js", "./middlewares/*.js","./models/*.js","./services/*.js"]
 };
 
 const swaggerUiOptions = {
     swaggerOptions: {
       docExpansion: "none", // Réduit toutes les routes par défaut
+      supportedSubmitMethods: process.env.NODE_ENV === "dev" ? ['get', 'post', 'put', 'delete'] : [], // N'active les tests qu'en mode développement
     }
   };
 

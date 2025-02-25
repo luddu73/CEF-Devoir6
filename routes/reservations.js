@@ -4,7 +4,7 @@ var router = express.Router();
 const serviceReservation = require('../services/reservations');
 
 // Import du middleware pour privatisation
-// PAS ENCORE UTILISER const private = require('../middlewares/private');
+const private = require('../middlewares/private');
 
 /**
  * @swagger
@@ -41,7 +41,7 @@ const serviceReservation = require('../services/reservations');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', serviceReservation.getAll);
+router.get('/', private.checkJWT, serviceReservation.getAll);
 
 /**
  * @swagger
@@ -85,7 +85,7 @@ router.get('/', serviceReservation.getAll);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id', serviceReservation.getById);
+router.get('/:id', private.checkJWT, serviceReservation.getById);
 
 /**
  * @swagger
@@ -133,7 +133,7 @@ router.get('/:id', serviceReservation.getById);
  *       501:
  *         description: "Erreur serveur."
  */
-router.post('/', serviceReservation.checkCatwayExists, serviceReservation.add);
+router.post('/', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.add);
 
 /**
  * @swagger
@@ -184,7 +184,7 @@ router.post('/', serviceReservation.checkCatwayExists, serviceReservation.add);
  *       501:
  *         description: "Erreur serveur."
  */
-router.put('/:idReservation', serviceReservation.checkCatwayExists, serviceReservation.update);
+router.put('/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.update);
 
 /**
  * @swagger
@@ -207,6 +207,6 @@ router.put('/:idReservation', serviceReservation.checkCatwayExists, serviceReser
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:idReservation', serviceReservation.checkCatwayExists, serviceReservation.delete);
+router.delete('/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.delete);
 
 module.exports = router;

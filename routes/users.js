@@ -11,7 +11,7 @@ var router = express.Router();
 const service = require('../services/users');
 
 // Import du middleware pour privatisation
-// PAS ENCORE UTILISER const private = require('../middlewares/private');
+const private = require('../middlewares/private');
 
 /**
  * @swagger
@@ -42,7 +42,7 @@ const service = require('../services/users');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', service.getAll);
+router.get('/', private.checkJWT, service.getAll);
 
 
 /**
@@ -81,7 +81,7 @@ router.get('/', service.getAll);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:email', service.getByEmail);
+router.get('/:email', private.checkJWT, service.getByEmail);
 
 /**
  * @swagger
@@ -121,7 +121,7 @@ router.get('/:email', service.getByEmail);
  *       501:
  *         description: "Erreur serveur."
  */
-router.post('/', service.add);
+router.post('/', private.checkJWT, service.add);
 
 /**
  * @swagger
@@ -166,7 +166,7 @@ router.post('/', service.add);
  *       501:
  *         description: "Erreur serveur."
  */
-router.put('/:email', service.update);
+router.put('/:email', private.checkJWT, service.update);
 
 /**
  * @swagger
@@ -189,7 +189,7 @@ router.put('/:email', service.update);
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:email', service.delete);
+router.delete('/:email', private.checkJWT, service.delete);
 
 
 /**
