@@ -37,7 +37,7 @@ const swaggerOptions = {
 const swaggerUiOptions = {
     swaggerOptions: {
       docExpansion: "none", // Réduit toutes les routes par défaut
-      supportedSubmitMethods: process.env.NODE_ENV === "dev" ? ['get', 'post', 'put', 'delete'] : [], // N'active les tests qu'en mode développement
+      supportedSubmitMethods: process.env.NODE_ENV === "development" ? ['get', 'post', 'put', 'delete'] : [], // N'active les tests qu'en mode développement
     }
   };
 
