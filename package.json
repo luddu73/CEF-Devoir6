@@ -1,31 +1,15 @@
 {
-  "name": "api-port-de-plaisance-russell",
-  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "env-cmd -f ./env/.env node ./bin/www",
-    "dev": "env-cmd -f ./env/.env.dev nodemon ./bin/www",
-    "prod": "env-cmd -f ./env/.env.prod node ./bin/www",
-    "doc": "jsdoc -c jsdoc.json"
+    "start": "npm run server & npm run client",
+    "server": "cd back && npm run prod",
+    "server-dev": "cd back && npm run dev",
+    "client": "cd front && npm run build",
+    "client-dev": "cd front && npm run start",
+    "prod": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server-dev\" \"npm run client-dev\""
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "cookie-parser": "~1.4.4",
-    "cors": "^2.8.5",
-    "debug": "~2.6.9",
-    "ejs": "^3.1.10",
-    "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "jade": "~1.11.0",
-    "jsdoc": "^4.0.4",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.0",
-    "morgan": "~1.9.1",
-    "nodemon": "^3.1.9",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
-  },
-  "devDependencies": {
-    "env-cmd": "^10.1.0"
+    "concurrently": "^9.1.2"
   }
 }
