@@ -1,18 +1,31 @@
-/**
- * @file Schéma Mongoose pour la collection "users"
- * @module models/users
- */
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 
 /**
- * Il définit la structure de la base de donnée utilisateur
- * @typedef {Object} User
- * @property {string} username - Le nom d'utilisateur (requis)
- * @property {string} email - L'adresse email (requise et unique)
- * @property {string} password - Le mot de passe hashé de l'utilisateur (requis. Doit avoir au moins 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial)
+ * @swagger
+ * components:
+ *  schemas:
+ *      User:
+ *          type: object
+ *          required:
+ *              - username
+ *              - email
+ *              - password
+ *          properties:
+ *              username:
+ *                  type: string
+ *                  description: Le nom d'utilisateur
+ *              email:
+ *                  type: string
+ *                  description: L'adresse email de l'utilisateur (doit être unique)
+ *              password: 
+ *                  type: string
+ *                  description: Mot de passe hashé de l'utilisateur (doit contenir 8 caractères minimum dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial)
+ *          example:
+ *              username: "JohnDoe"
+ *              email: "john.doe@example.com"
+ *              password: "$2b$10$abc123hashedpassw0rd"
  */
 
 const User = new Schema({
