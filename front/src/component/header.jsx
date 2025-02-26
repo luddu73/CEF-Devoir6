@@ -32,15 +32,15 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
+    <AppBar component="header" position="static">
+      <Container component="nav" maxWidth="xl">
         <Toolbar disableGutters>
           <Anchor sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
             component="a"
-            href="index"
+            href="./"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -92,7 +92,7 @@ function ResponsiveAppBar() {
             variant="h5"
             noWrap
             component="a"
-            href="index"
+            href="./"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
