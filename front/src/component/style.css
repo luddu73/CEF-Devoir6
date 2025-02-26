@@ -25,6 +25,9 @@ body {
   text-align: center;
   align-items: center;
   border-radius: 3%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 h1{
