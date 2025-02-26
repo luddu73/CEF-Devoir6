@@ -19,6 +19,10 @@ const jwt = require('jsonwebtoken');
 exports.authenticate = async (req, res, next) => {
     const { email, password } = req.body; // On récupère l'email et le password proposé
 
+    if (!email || !password)
+    {
+        return res.status(400).json('Un des champs n\'est pas renseigné.');
+    }
     try {
         let user = await User.findOne({ email: email}, '-__v -createdAt -updatedAt'); // On cherche l'user avec l'email
 

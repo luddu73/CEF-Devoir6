@@ -238,6 +238,8 @@ router.delete('/:email', private.checkJWT, service.delete);
  *             description: "Token JWT renvoyé dans l'en-tête pour les requêtes futures"
  *             schema:
  *               type: string
+ *       400:
+ *         description: "Un des champs n'est pas renseigné"
  *       403:
  *         description: "Mot de passe incorrect"
  *       404:
