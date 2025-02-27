@@ -36,13 +36,14 @@ console.log(process.env.NODE_ENV);
 });*/
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -71,16 +72,5 @@ app.use(function(err, req, res, next) {
 app.use(function(req, res, next) {
   res.status(404).json({name: 'API', version: '1.0', status: 404, message: 'not found'})
 })
-
-
-// Servir les fichiers React en production
-app.use(express.static(path.join(__dirname, "../front/build")));
-
-app.get("*", (req, res) => {
-  if (req.originalUrl.startsWith("/api-docs")) {
-    return next();
-  }
-  res.sendFile(path.join(__dirname, "../front/build", "index.html"));
-});
 
 module.exports = app;

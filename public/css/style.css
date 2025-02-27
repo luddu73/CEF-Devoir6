@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.logo {
+    color:white;
+    font-size:2rem;
+    margin:0.1em;
+    opacity:50%;
+  }
+/* Changement de couleur lors du passage de la sourie icone réseaux sociaux */
+.logo:hover{
+    opacity:100%;
+    transition: all 0.3s ease-out;
+}
+body 
+{
+    background-image: url("../img/background.jpg");
+    background-position: 50% 75%;
+  }
