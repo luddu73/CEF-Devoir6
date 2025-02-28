@@ -70,7 +70,11 @@ app.use(function(err, req, res, next) {
 });
 // Si la page n'est pas trouvée, on renvoi l'erreur
 app.use(function(req, res, next) {
-  res.status(404).json({name: 'API', version: '1.0', status: 404, message: 'not found'})
+ // res.status(404).json({name: 'API', version: '1.0', status: 404, message: 'not found'})
+ res.status(404).render('errors', {
+  title: '404 - Page Non Trouvée',
+  message: 'La page que vous cherchez n\'existe pas.'
+});
 })
 
 module.exports = app;
