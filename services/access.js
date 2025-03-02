@@ -53,7 +53,7 @@ exports.authenticate = async (req, res, next) => {
                     //return res.status(200).json('Authentification réussie');
                     req.user = user;
                     res.locals.user = user; // Disponible dans EJS
-                    return res.render('index', { message: 'Authentification réussie.' });
+                    return res.render('index', { message: 'Authentification réussie. Vous allez être redirigé !' });
                 }
 
                 //return res.status(403).json('Mot de passe incorrect');
