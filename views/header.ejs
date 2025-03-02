@@ -39,7 +39,12 @@
         <div class="absolute inset-y-0 flex grid justify-items-end pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 w-1/6">
           <div class="relative ml-3 hidden sm:ml-6 xl:block">
             <a href="/api-docs" target="_blank" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-blue-700 hover:text-white">Documentations</a>
-            <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-blue-700 hover:text-white">Se connecter</a>
+            <% if (typeof user !== 'undefined' && user) { %>
+              Bienvenue, <%= user.username %> !
+              <a href="/logout" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-blue-700 hover:text-white">Se déconnecter</a>
+            <% } else { %> 
+              <a href="#" onclick="openModal()" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-blue-700 hover:text-white">Se connecter</a>
+            <% } %> 
           </div>
         </div>
       </div>
@@ -50,7 +55,12 @@
       <div class="space-y-1 px-2 pt-2 pb-3">
         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
         <a href="/api-docs" target="_blank" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Documentations</a>
-        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Se connecter</a>
+        <% if (typeof user !== 'undefined' && user) { %>
+          Bienvenue, <%= user.username %> !
+          <a href="/logout" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Se déconnecter</a>
+        <% } else { %> 
+          <a href="#" onclick="openModal()" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Se connecter</a>
+        <% } %> 
       </div>
     </div>
   </nav>

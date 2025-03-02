@@ -44,7 +44,7 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', service.getAll);
+router.get('/', private.checkJWT, service.getAll);
 
 
 /**
@@ -202,51 +202,5 @@ router.put('/:email', private.checkJWT, service.update);
  *         description: "Erreur serveur."
  */
 router.delete('/:email', private.checkJWT, service.delete);
-
-
-/**
- * @swagger
- * /users/login:
- *   post:
- *     tags:
- *       - "Users"
- *     summary: "Connecte un utilisateur"
- *     description: "Vérifie l'email et le mot de passe fournis, puis génère un token JWT en cas de succès."
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: "johndoe@example.com"
- *               password:
- *                 type: string
- *                 format: password
- *                 example: "MotDePasse123!"
- *     responses:
- *       200:
- *         description: "Authentification réussie"
- *         headers:
- *           Authorization:
- *             description: "Token JWT renvoyé dans l'en-tête pour les requêtes futures"
- *             schema:
- *               type: string
- *       400:
- *         description: "Un des champs n'est pas renseigné"
- *       403:
- *         description: "Mot de passe incorrect"
- *       404:
- *         description: "Utilisateur inexistant"
- *       501:
- *         description: "Erreur serveur"
- */
-router.post('/login', service.authenticate);
 
 module.exports = router;

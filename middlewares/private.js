@@ -16,35 +16,26 @@ const SECRET_KEY = process.env.SECRET_KEY;
  * @returns {response} Renvoi un 404 en cas d'échec, sinon on passe à la fonction suivante.
  */
 exports.checkJWT = async (req, res, next) => {
-    let token = req.headers['x-access-token'] || req.headers['authorization'];
-    // On vérifie que le token commence par 'Bearer '
-    if (!!token && token.startsWith('Bearer ')) {
-        token = token.slice(7, token.length);
-    }
+    let token = req.cookies.jwt;
 
     if (token) {
         jwt.verify(token, SECRET_KEY, (err, decoded) => {
             if (err) {
-                return res.status(401).json('Token de sécurité invalide');
+                res.clearCookie('jwt'); // Supprime le cookie si invalide
+                // return res.status(401).json('Token de sécurité invalide');
+                return res.render('index');
+                //return res.render('error', { errorCode:"401", title:"Token de sécurité invalide", message: 'Vous devez vous reconnecter.' });
             } else {
-                req.decoded = decoded;
-
-                // Génération d'un token pour continuer notre session
-                const expiresIn = process.env.JWT_EXPIRE * 60 * 60;
-                const newToken = jwt.sign({
-                    user : decoded.user
-                },
-                SECRET_KEY,
-                {
-                    expiresIn: expiresIn
-                });
-
-                // Ajout du token crée dans l'header
-                res.header('Authorization', 'Bearer ' + newToken);
+                req.user = decoded.user; 
+                res.locals.user = decoded.user; // Rend accessible l'utilisateur dans EJS
                 next();
             }
         });
     } else {
-        return res.status(401).json('Token de sécurité nécessaire');
+        res.locals.user = null;
+        return res.render('index');
+        //return res.render('error', { errorCode:"401", title:"Token de sécurité nécessaire", message: 'Vous devez vous reconnecter.' });
+        //return res.status(401).json('Token de sécurité nécessaire');
+        next();
     }
 }
