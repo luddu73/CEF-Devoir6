@@ -21,7 +21,8 @@ exports.authenticate = async (req, res, next) => {
 
     if (!email || !password)
     {
-        return res.status(400).json('Un des champs n\'est pas renseigné.');
+        //return res.status(400).json('Un des champs n\'est pas renseigné.');
+        return res.render('index', { errorMessage: 'Les champs sont obligatoires.' });
     }
     try {
         let user = await User.findOne({ email: email}, '-__v -createdAt -updatedAt'); // On cherche l'user avec l'email
@@ -45,13 +46,16 @@ exports.authenticate = async (req, res, next) => {
 
                     res.header('Authorization', 'Bearer ' + token);
                     
-                    return res.status(200).json('Authentification réussie');
+                    //return res.status(200).json('Authentification réussie');
+                return res.render('index', { message: 'Authentification réussie.' });
                 }
 
-                return res.status(403).json('Mot de passe incorrect');
+                //return res.status(403).json('Mot de passe incorrect');
+                return res.render('index', { errorMessage: 'Mot de passe incorrect.' });
             });
         } else {
-            return res.status(404).json('Utilisateur inexistant');
+            //return res.status(404).json('Utilisateur inexistant');
+            return res.render('index', { errorMessage: 'Utilisateur inexistant.' });
         }
     } catch (error) {
         return res.status(501).json(error);
