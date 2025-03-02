@@ -1,6 +1,6 @@
-<%- include('layout'); -%>
+<%- include('components/layout'); -%>
 <body class="min-h-screen flex flex-col overflow-x-hidden">
-    <%- include('header'); -%>
+    <%- include('components/header'); -%>
     <main class="flex flex-grow items-center justify-center w-full">
         <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-row" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
 
@@ -14,5 +14,5 @@
 
         </div>
     </main>
-    <%- include('footer'); -%>
+    <%- include('components/footer'); -%>
 </body>

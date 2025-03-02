@@ -1,6 +1,6 @@
-<%- include('layout'); -%>
+<%- include('components/layout'); -%>
 <body class="min-h-screen flex flex-col">
-    <%- include('header'); -%>
+    <%- include('components/header'); -%>
     <div class="flex flex-grow items-center justify-center">
         <div class="bg-gray-900 bg-opacity-70 text-white p-8 rounded-lg max-w-5xl w-full text-center shadow-lg">
             <h1 class="text-4xl font-bold mb-4">Port de Plaisance de Russell</h1>
@@ -21,7 +21,7 @@
             </button>
         </div>
     </div>
-    <%- include('footer'); -%>
+    <%- include('components/footer'); -%>
 
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if ((typeof errorMessage !== 'undefined' && errorMessage) || (typeof message !== 'undefined' && message)) { %>block<% } else { %>hidden<% } %>">
         <div id="modalBackdrop" onclick="closeModal()" class="absolute inset-0 z-10"></div>
