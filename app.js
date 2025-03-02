@@ -12,6 +12,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var catwaysRouter = require('./routes/catways');
 var reservationsRouter = require('./routes/reservations');
+var dashboardRouter = require('./routes/dashboard');
 
 mongodb.initClientDbConnection();
 
@@ -46,6 +47,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/dashboard', dashboardRouter);
 app.use('/users', usersRouter);
 app.use('/catways', catwaysRouter);
 app.use('/reservations', reservationsRouter);

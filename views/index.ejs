@@ -14,7 +14,10 @@
                 contrôle optimal des informations.
             </p>
             <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
-                Se connecter
+                <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+            </button>
+            <button onclick="openModal()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition">
+                <i class="fa-solid fa-book"></i> Documentation
             </button>
         </div>
     </div>
@@ -51,6 +54,13 @@
     </div>
       
       <script>
+        <% if (typeof message !== 'undefined' && message) { %>
+            // Redirection vers le dashboard après 3 secondes
+            setTimeout(function() {
+                window.location.href = '/dashboard'; // Redirige vers le dashboard
+            }, 3000);
+        <% } %>
+
         function openModal() {
           document.getElementById("loginModal").classList.remove("hidden");
         }
