@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 text-gray-900">
-    <div class="min-h-screen flex items-center justify-center flex-col">
-        <h1 class="text-5xl font-bold text-red-600"><%= title %></h1>
-        <p class="text-xl text-center mt-4"><%= message %></p>
-        <a href="/" class="mt-6 text-lg text-blue-500">Retour à l'accueil</a>
-    </div>
+<%- include('layout'); -%>
+<body class="min-h-screen bg-gray-100 text-gray-900">
+    <main class="min-h-screen grid md:grid-cols-2 min-h-full place-items-center bg-white ">
+        <div class="text-center px-6 py-24 sm:py-32 lg:px-8 md:w-2/2">
+          <p class="text-base font-semibold text-blue-800"><%= errorCode %></p>
+          <h1 class="mt-4 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl"><%= title %></h1>
+          <p class="mt-6 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8"><%= message %></p>
+          <div class="mt-10 flex items-center justify-center gap-x-6">
+            <a href="/" class="rounded-md bg-blue-800 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-800">Retour à l'accueil</a>
+          </div>
+        </div>
+        <div class="min-h-screen hidden md:block">
+            <img class="min-h-screen object-contain md:object-cover" src="../img/errors.jpg">
+        </div>
+      </main>
 </body>
 </html>

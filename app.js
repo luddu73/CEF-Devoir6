@@ -55,7 +55,11 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOpti
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  res.status(404).render('error', {
+    errorCode: '404',
+    title: 'Page Non Trouvée',
+    message: 'La page que vous cherchez n\'existe pas.'
+  });
 });
 
 // error handler
@@ -65,16 +69,11 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.status(err.status || 500).render('error', {
+    errorCode: `${err.status || 500}`,
+    title: `${err.message || "Erreur"}`,
+    message: "Une erreur est survenue. Veuillez réessayer plus tard."
+  });
 });
-// Si la page n'est pas trouvée, on renvoi l'erreur
-app.use(function(req, res, next) {
- // res.status(404).json({name: 'API', version: '1.0', status: 404, message: 'not found'})
- res.status(404).render('errors', {
-  title: '404 - Page Non Trouvée',
-  message: 'La page que vous cherchez n\'existe pas.'
-});
-})
 
 module.exports = app;
