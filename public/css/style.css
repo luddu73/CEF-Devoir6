@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html, body {
+  @apply min-h-screen flex flex-col;
+  margin: 0;
+  display:flex;
+  flex-direction: column;
+  margin:0;
+}
+
+.logo {
+    color:white;
+    font-size:2rem;
+    margin:0.1em;
+    opacity:50%;
+  }
+.logo:hover{
+    opacity:100%;
+    transition: all 0.3s ease-out;
+}
+
+body 
+{
+    background-image: url("../img/background.jpg");
+    background-position: 50% 75%;
+}
+footer{
+  @apply mt-auto w-full text-center py-8 text-white;
+}

@@ -36,13 +36,14 @@ console.log(process.env.NODE_ENV);
 });*/
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -54,7 +55,11 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOpti
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  res.status(404).render('error', {
+    errorCode: '404',
+    title: 'Page Non Trouvée',
+    message: 'La page que vous cherchez n\'existe pas.'
+  });
 });
 
 // error handler
@@ -64,23 +69,11 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-// Si la page n'est pas trouvée, on renvoi l'erreur
-app.use(function(req, res, next) {
-  res.status(404).json({name: 'API', version: '1.0', status: 404, message: 'not found'})
-})
-
-
-// Servir les fichiers React en production
-app.use(express.static(path.join(__dirname, "../front/build")));
-
-app.get("*", (req, res) => {
-  if (req.originalUrl.startsWith("/api-docs")) {
-    return next();
-  }
-  res.sendFile(path.join(__dirname, "../front/build", "index.html"));
+  res.status(err.status || 500).render('error', {
+    errorCode: `${err.status || 500}`,
+    title: `${err.message || "Erreur"}`,
+    message: "Une erreur est survenue. Veuillez réessayer plus tard."
+  });
 });
 
 module.exports = app;
