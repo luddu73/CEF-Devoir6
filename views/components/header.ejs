@@ -20,4 +20,15 @@
           </div>
       </div>
   </div>
+  <!-- Mobile menu, show/hide based on menu state. -->
+  <% if (typeof user !== 'undefined' && user) { %>
+  <div class="xl:hidden" id="mobile-menu">
+    <div class="space-y-1 px-2 pt-2 pb-3">
+        <!-- Bouton Menu pour mobile -->
+        <button onclick="toggleSidebar()" id="sidebarButton" class="md:hidden text-white top-4 left-4 z-10">
+            ☰ Menu
+        </button>
+    </div>
+  </div>
+  <% } %>
 </nav>
