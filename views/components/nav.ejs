@@ -1,0 +1,59 @@
+<div id="sidebar" class="bg-gray-800 text-white w-64 space-y-6 p-6 transform transition-transform duration-300 ease-in-out rounded-tl-lg rounded-bl-lg md:block hidden" style="flex-shrink: 0; height: 100%;">
+    <div class="space-y-4">
+        <section name="topMenu" class="text-center">
+            <button onclick="toggleSidebar()" id="closeSidebarButton" class="md:hidden text-white top-4 left-4 z-10">
+                <i class="fa-solid fa-xmark"></i> Fermer le menu
+            </button>
+            <h2 class="text-xl font-bold mb-4">Bienvenue <%= user.username %> !</h2>
+            <p>Nous sommes le <br>
+                <span>
+                    <script>
+                        date = new Date().toLocaleDateString();
+                        document.write(date);
+                    </script>
+                </span>
+            </p>
+        </section>
+        <ul>
+            <li><a href="#" class="block py-2 px-4 hover:bg-gray-700"><i class="fa-solid fa-gauge"></i> Accueil</a></li>
+            <li><a href="#" class="block py-2 px-4 hover:bg-gray-700"><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
+            <li><a href="#" class="block py-2 px-4 hover:bg-gray-700"><i class="fa-solid fa-sailboat"></i> Catways</a></li>
+            <li><a href="#" class="block py-2 px-4 hover:bg-gray-700"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
+        </ul>
+        <hr>
+        <ul>
+            <li><a href="/api_docs" target="_blank" class="block py-2 px-4 hover:bg-gray-700"><i class="fa-solid fa-book"></i> Documentations</a></li>
+            <li><a href="/logout" class="block py-2 px-4 hover:bg-gray-700"><i class="fa-solid fa-left-from-bracket"></i> Se déconnecter</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Bouton Menu pour mobile -->
+<button onclick="toggleSidebar()" id="sidebarButton" class="md:hidden text-white top-4 left-4 z-10">
+    ☰ Menu
+</button>
+
+
+
+<script>
+    // Fonction pour ouvrir et fermer le menu latéral avec animation de glissement
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarButton = document.getElementById('sidebarButton');  // ID du bouton
+
+        // Si la sidebar est cachée, on la fait glisser de gauche à droite
+        if (sidebar.classList.contains("hidden")) {
+            sidebar.classList.remove("hidden");
+            setTimeout(function () {
+                sidebar.style.transform = 'translateX(0)'; // Glissement vers la droite
+            }, 10); // Le timeout permet à la transition de se déclencher
+            sidebarButton.style.display = "none"; // Cacher le bouton Menu lorsqu'on ouvre la sidebar
+        } else {
+            sidebar.style.transform = 'translateX(-100%)'; // Glissement vers la gauche
+            setTimeout(function () {
+                sidebar.classList.add("hidden");
+            }, 300); // Attendre la fin de l'animation avant de cacher la sidebar
+            sidebarButton.style.display = "block"; // Afficher le bouton Menu quand la sidebar est fermée
+        }
+    }
+</script>
