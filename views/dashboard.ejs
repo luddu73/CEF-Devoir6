@@ -1,19 +1,57 @@
 <%- include('layout'); -%>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col overflow-x-hidden">
     <%- include('header'); -%>
-    <div class="flex flex-grow items-center justify-center">
-        <div class="bg-gray-900 bg-opacity-70 text-white p-8 rounded-lg max-w-5xl w-full text-center shadow-lg">
-            <h1 class="text-4xl font-bold mb-4">Port de Plaisance de Russell</h1>
-            
-            <p class="text-xl font-semibold mb-4">Bienvenue sur l'application de gestion des réservations de catways du port de plaisance de Russell</p>
-        
-            <p class="text-gray-300 text-lg mb-6">
-                Cette plateforme vous permet de gérer facilement les réservations des catways, ces appontements réservés pour amarrer vos bateaux. 
-                Grâce à une interface simple et intuitive, la capitainerie peut suivre en temps réel l'occupation des catways, les dates de réservation et 
-                les informations associées aux réservations. L'application offre également une gestion sécurisée des utilisateurs et une API privée pour un 
-                contrôle optimal des informations.
-            </p>
+    <main class="flex flex-grow items-center justify-center w-full">
+        <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-col" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
+
+            <!-- Sidebar (menu latéral) -->
+            <div id="sidebar" class="bg-gray-800 text-white w-64 space-y-6 p-6 transform transition-transform duration-300 ease-in-out rounded-tl-lg rounded-bl-lg md:block hidden" style="flex-shrink: 0; height: 100%;">
+
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold mb-4">Bienvenue <%= user.username %> !</h2>
+                    <ul>
+                        <li><a href="#" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
+                        <li><a href="#" class="block py-2 px-4 hover:bg-gray-700">Réservations</a></li>
+                        <li><a href="#" class="block py-2 px-4 hover:bg-gray-700">Utilisateurs</a></li>
+                        <li><a href="#" class="block py-2 px-4 hover:bg-gray-700">Paramètres</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bouton Menu pour mobile -->
+            <button onclick="toggleSidebar()" id="sidebarButton" class="md:hidden text-white top-4 left-4 z-10">
+                ☰ Menu
+            </button>
+
+            <!-- Main content area -->
+            <div class="flex-1 p-8" style="height: 100vh;">
+                <!-- Contenu principal -->
+            </div>
+
         </div>
-    </div>
+    </main>
     <%- include('footer'); -%>
 </body>
+
+<script>
+    // Fonction pour ouvrir et fermer le menu latéral avec animation de glissement
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarButton = document.getElementById('sidebarButton');  // ID du bouton
+
+        // Si la sidebar est cachée, on la fait glisser de gauche à droite
+        if (sidebar.classList.contains("hidden")) {
+            sidebar.classList.remove("hidden");
+            setTimeout(function () {
+                sidebar.style.transform = 'translateX(0)'; // Glissement vers la droite
+            }, 10); // Le timeout permet à la transition de se déclencher
+            sidebarButton.style.display = "none"; // Cacher le bouton Menu lorsqu'on ouvre la sidebar
+        } else {
+            sidebar.style.transform = 'translateX(-100%)'; // Glissement vers la gauche
+            setTimeout(function () {
+                sidebar.classList.add("hidden");
+            }, 300); // Attendre la fin de l'animation avant de cacher la sidebar
+            sidebarButton.style.display = "block"; // Afficher le bouton Menu quand la sidebar est fermée
+        }
+    }
+</script>

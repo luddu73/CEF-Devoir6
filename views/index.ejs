@@ -54,6 +54,13 @@
     </div>
       
       <script>
+        <% if (typeof user !== 'undefined' && user && typeof message == 'undefined') { %>
+            // Redirection vers le dashboard si l'utilisateur est connecté
+            setTimeout(function() {
+                window.location.href = '/dashboard'; // Redirige vers le dashboard
+            }, 0);
+        <% } %>
+
         <% if (typeof message !== 'undefined' && message) { %>
             // Redirection vers le dashboard après 3 secondes
             setTimeout(function() {
