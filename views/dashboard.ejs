@@ -2,7 +2,7 @@
 <body class="min-h-screen flex flex-col overflow-x-hidden">
     <%- include('components/header'); -%>
     <main class="flex flex-1 items-center justify-center w-full">
-        <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-row" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
+        <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-row overflow-y-auto" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
 
             <!-- Sidebar (menu latéral) -->
             <%- include('components/nav'); -%>
@@ -14,7 +14,7 @@
                 <div class="grid grid-cols-2">
                     <section class="col-span-2 m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg overflow-x-auto">
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Réservations en cours</h2>
-                        <p class="m-3 text-blue-800">Il y a <strong>0</strong> réservation en cours.</p>
+                        <p class="m-3 text-blue-800">Il y a <strong><%= currentReservations.length %></strong> réservation en cours.</p>
                         <table class="min-w-full divide-y divide-gray-300">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -26,11 +26,12 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white">
+                                <% if (currentReservations.length > 0) { currentReservations.forEach(function(reservation) { %>
                                 <tr>
-                                    <td class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6">1</td>
-                                    <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500">Jack Sparrow</td>
-                                    <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500">Black Pearl</td>
-                                    <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500">10/03/2025 (x jours)</td>
+                                    <td class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6"><%= reservation.catwayNumber %></td>
+                                    <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.clientName %></td>
+                                    <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.boatName %></td>
+                                    <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.endDate.toLocaleDateString().slice(0, 10) %></td>
                                     <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-white">
                                         <span class="isolate inline-flex rounded-md shadow-xs">
                                             <button type="button" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
@@ -42,13 +43,19 @@
                                         </span>
                                     </td>
                                 </tr>
+                                <% }); 
+                                } else { %> 
+                                <tr>
+                                    <td col="5">Aucune réservation en cours</td>
+                                </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </section>
                     <div class="m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg">
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-sailboat"></i> Catways</h2>
-                        <p class="m-3 text-blue-800">Il y a <strong>0</strong> catways disponibles (dont 0 long et 0 short).</p>
-                        <p class="m-3 text-blue-800">Actuellement, 0% des catways sont disponibles.</p>
+                        <p class="m-3 text-blue-800">Il y a <strong><%= availableCatwaysCount %></strong> catways disponibles (dont <%= availableLongCatways %> long et <%= availableShortCatways %> short).</p>
+                        <p class="m-3 text-blue-800">Actuellement, <%= availabilityPercentage %>% des catways sont disponibles.</p>
                         <div class="center w-full h-40 flex items-center justify-center">
                             <svg class="w-full h-full" viewBox="0 0 100 100">
                               <!-- Background circle -->
@@ -74,13 +81,13 @@
                               ></circle>
                               
                               <!-- Center text -->
-                              <text x="50" y="50" text-anchor="middle" alignment-baseline="middle">100%</text>
+                              <text x="50" y="50" text-anchor="middle" alignment-baseline="middle"><%= availabilityPercentage %>%</text>
                           
                             </svg>
                         </div>
                         <script>
                             // Définir le pourcentage
-                            const percentage = 100; // Change cette valeur pour tester différents pourcentages
+                            const percentage = <%= availabilityPercentage %>; // Change cette valeur pour tester différents pourcentages
                           
                             // Calculer la circonférence du cercle
                             const radius = 40;
@@ -99,10 +106,10 @@
                     </div>
                     <div class="m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg">
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-chart-line"></i> Statistiques</h2>
-                        <p class="m-3 text-blue-800">Catway le plus souvent utilisé : <strong>0</strong></p>
-                        <p class="m-3 text-blue-800">Durée moyenne de réservation : <strong>0 jours</strong></p>
-                        <p class="m-3 text-blue-800">Le taux moyen de fréquentation est de 0%.</p>
-                        <p class="m-3 text-blue-800">Notre port a enregistré 0 réservations.</p>
+                        <p class="m-3 text-blue-800">Catway le plus souvent utilisé : <strong><%= mostReservedCatwayNumber %></strong></p>
+                        <p class="m-3 text-blue-800">Durée moyenne de réservation : <strong><%= avgDuration %> jours</strong></p>
+                        <p class="m-3 text-blue-800">Le taux moyen de fréquentation est de <%= totalReservedDays %>%.</p>
+                        <p class="m-3 text-blue-800">Notre port a enregistré <%= totalReservations %> réservations.</p>
                     </div>
                 </div>
             </div>
