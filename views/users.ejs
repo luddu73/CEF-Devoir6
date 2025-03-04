@@ -47,7 +47,7 @@
                                 <% } %>
                                 <tr>
                                     <td colspan="3" class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6 text-center">
-                                        <button type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                        <button onclick="openModal()" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                                             <i class="fa-solid fa-user-plus"></i> Créer un utilisateur
                                         </button>
                                     </td>
@@ -57,8 +57,175 @@
                     </section>
                 </div>
             </div>
-
         </div>
+
+
+        <div id="createUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if ((typeof errorMessage !== 'undefined' && errorMessage) || (typeof message !== 'undefined' && message)) { %>block<% } else { %>block<% } %>">
+            <div id="modalBackdrop" onclick="closeModal()" class="absolute inset-0 z-10"></div>
+            <div id="modalContent" class="bg-white p-6 rounded-lg shadow-lg max-w-5xl w-full text-center z-20">
+              <h2 class="text-2xl font-bold mb-4">Créer un utilisateur</h2>
+                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                <div class="flex items-center p-4 mb-4 text-sm text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg" role="alert">
+                  <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"></path>
+                  </svg>
+                  <%= errorMessage %>
+                </div>
+                <% } %>
+                <% if (typeof message !== 'undefined' && message) { %>
+                    <div class="flex items-center p-4 mb-4 text-sm text-green-700 bg-green-100 border-l-4 border-green-500 rounded-lg" role="alert">
+                    <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
+                    </svg>
+                    <%= message %>
+                </div>
+                <% } %>
+              <form action="/users" method="POST" class="flex flex-col gap-2">
+                    <div class="relative flex" id="usernameInput">
+                        <input id="username" name="text" type="text" placeholder="Nom d'utilisateur" class="w-full px-3 py-2 border rounded" >
+                        <i id="usernameErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                    </div>
+                   
+                    <div class="relative flex" id="emailInput">
+                        <input type="email" name="email" id="email" class="w-full px-3 py-2 border rounded pr-10" placeholder="Email" >
+                        <i id="emailErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                    </div>
+                    <div class="relative flex flex-col" id="passwordInput">
+                        <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded pr-10" placeholder="Mot de passe" >
+                        <i id="passwordErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                    </div>
+                    <div class="relative flex flex-col" id="confirmPasswordInput">
+                        <input type="password" name="confirmPassword" id="confirmPassword" class="w-full px-3 py-2 border rounded pr-10" placeholder="Confirmer le mot de passe" >
+                        <i id="confirmPasswordErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                    </div>
+                    
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">Créer</button>
+              </form>
+              <button onclick="closeModal()" class="text-red-500 mt-4 block w-full">Annuler</button>
+            </div>
+        </div>
+        <script>
+            function openModal() {
+              document.getElementById("createUserModal").classList.remove("hidden");
+            }
+            
+            function closeModal() {
+              document.getElementById("createUserModal").classList.add("hidden");
+            }
+
+            const checkEmail = (email) => {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            };
+            const checkPassword = (password) => {
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+                return passwordRegex.test(password);
+            };
+            const checkPasswordLength = (password) => {
+                return password.length >= 8;
+            };
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.querySelector("form");
+                const usernameInput = document.getElementById("username");
+                const emailInput = document.getElementById("email");
+                const passwordInput = document.getElementById("password");
+                const confirmPassword = document.getElementById("confirmPassword");
+
+                // Fonction pour valider un champ individuellement
+                const validateInput = (inputElement, validationFunction, errorId, errorMessage) => {
+                    if (!validationFunction(inputElement.value)) {
+                        addErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`, `${inputElement.id}Input`, errorMessage);
+                    } else {
+                        removeErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`);
+                    }
+                };
+
+                // Contrôle individuel des champs
+                if (usernameInput) {
+                    usernameInput.addEventListener("input", () => {
+                        validateInput(usernameInput, value => value !== "", "username", "Vous devez saisir un nom d'utilisateur.");
+                    });
+                }
+                if (emailInput) {
+                    emailInput.addEventListener("input", () => {
+                        validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide."); // On vérifie la présentation de l'email
+                    });
+                }
+                if (passwordInput) {
+                    passwordInput.addEventListener("input", () => {
+                        validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
+                    });
+                }
+                if (confirmPassword) {
+                    confirmPassword.addEventListener("input", () => {
+                        validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
+                    });
+                }
+
+
+                // On vérifie le formulaire avant envoi
+                const validateForm = () => {
+                    let isValid = true;
+
+                    // Check de l'ensemble des critères
+                    isValid &= validateInput(usernameInput, value => value !== "", "username", "Vous devez saisir un nom d'utilisateur.");
+                    isValid &= validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
+                    isValid &= validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
+                    isValid &= validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
+
+                    return isValid;
+                };
+
+                // Écouteur sur le submit du formulaire
+                form.addEventListener("submit", (event) => {
+                    event.preventDefault(); // Empêche l'envoi du formulaire si les champs ne sont pas tous ok
+                    if (validateForm()) {
+                        form.submit(); // Si tout est valide, on soumet le formulaire
+                    }
+                });
+            });
+
+
+
+            function addErrorInfo(parametre,parametreIcon,parametreForm,texte) // Fonction qui permet d'ajouter une information d'erreur sur le formulaire
+            {
+                let input = document.getElementById(parametre);
+                let inputErrorIcon = document.getElementById(parametreIcon);
+                let inputForm = document.getElementById(parametreForm);
+                if ( inputErrorIcon.style.display === "none")
+                {   
+                    input.classList.add("border-red-500");
+                    input.classList.add("text-red-500");
+                    inputErrorIcon.style.display = "inline-block";
+                        
+                    let alertDiv = document.createElement("div");
+                    let contenuAlertDiv = document.createTextNode(texte); 
+                    alertDiv.appendChild(contenuAlertDiv); // Mon texte est enfant de ma nouvelle div
+                    alertDiv.setAttribute("class", "text-red-700 text-sm mt-0 top-1"); // J'ajoute à ma div une class
+                    alertDiv.setAttribute("id", "invalid"+parametre); // ainsi qu'un ID
+                    alertDiv.style.display = "flex"; // Je met à jour le style qui est par défaut sur none
+                    inputForm.after(alertDiv); // Ma nouvelle div est ajoutée à la suite de l'input
+                    pasok = 1;
+                }
+            }
+            function removeErrorInfo(parametre,parametreIcon) // Fonction qui retire l'information d'erreur sur le formulaire
+            {
+                let input = document.getElementById(parametre);
+                let inputErrorIcon = document.getElementById(parametreIcon);
+                if(document.getElementById('invalid'+parametre)) // Si le nom n'est pas vide et un élement à cet ID
+                {
+                    let invalidDiv = document.getElementById("invalid"+parametre); // Je récupère la div 
+                    invalidDiv.remove(); // et l'a supprime
+
+                    input.classList.remove("border-red-500");
+                    input.classList.remove("text-red-500");
+                    inputErrorIcon.style.display = "none";
+                }
+            }
+
+          </script>
+
     </main>
     <%- include('components/footer'); -%>
 </body>
