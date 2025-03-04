@@ -46,7 +46,7 @@
                                 <% }); 
                                 } else { %> 
                                 <tr>
-                                    <td col="5">Aucune réservation en cours</td>
+                                    <td colspan="5" class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6">Aucune réservation en cours</td>
                                 </tr>
                                 <% } %>
                             </tbody>
@@ -108,7 +108,7 @@
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-chart-line"></i> Statistiques</h2>
                         <p class="m-3 text-blue-800">Catway le plus souvent utilisé : <strong><%= mostReservedCatwayNumber %></strong></p>
                         <p class="m-3 text-blue-800">Durée moyenne de réservation : <strong><%= avgDuration %> jours</strong></p>
-                        <p class="m-3 text-blue-800">Le taux moyen de fréquentation est de <%= totalReservedDays %>%.</p>
+                        <p class="m-3 text-blue-800">Le taux moyen de fréquentation est de <%= occupationRate %>%.</p>
                         <p class="m-3 text-blue-800">Notre port a enregistré <%= totalReservations %> réservations.</p>
                     </div>
                 </div>

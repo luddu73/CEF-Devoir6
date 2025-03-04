@@ -10,13 +10,12 @@ const Reservation = require('../models/reservations');
 router.get('/', private.checkJWT, async function(req, res, next) {  
   try {
     const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
 
     // Récupérer les réservations en cours
     const currentReservations = await Reservation.find({
         startDate: { $lte: currentDate },
         endDate: { $gte: currentDate }
-      });
+      }).sort({ endDate: 1 });
 
     // Récupérer les catways réservés à la date d'aujourd'hui
     const currentReservedCatways = await Reservation.distinct("catwayNumber", {
@@ -55,16 +54,20 @@ router.get('/', private.checkJWT, async function(req, res, next) {
         return acc + duration;   // Adition des différentes réservations
       }, 0);
   
-      const avgDuration = totalDays / reservationsList.length;
+      const avgDuration = Math.round(totalDays / reservationsList.length);
 
        // Créer une date un an plus tôt pour analyse de la fréquentation sur la période
        const yearDate = new Date(currentDate);
        yearDate.setFullYear(currentDate.getFullYear() - 1);
        // Calcul du taux moyen de fréquentation sur l'année en cours
         const reservationsYearList = await Reservation.find({
-            startDate: { $gte: yearDate },
-            endDate: { $lte: currentDate }
+            $or: [
+                { startDate: { $lte: currentDate }, endDate: { $gte: yearDate } }, // Réservations qui chevauche la période choisie
+                { startDate: { $gte: yearDate, $lte: currentDate } }, // Réservations commencées dans l'année
+                { endDate: { $gte: yearDate, $lte: currentDate } } // Réservations terminées dans l'année
+            ]
         });
+        
         // Calcul du nombre total de jours réservés pour ces réservations
         const totalReservedDays = reservationsYearList.reduce((acc, reservation) => {
             const duration =
@@ -73,9 +76,9 @@ router.get('/', private.checkJWT, async function(req, res, next) {
             return acc + duration;
         }, 0);
         // Nombre de jours totaux disponibles sur l'année (nombre de catway * 365 jours)
-        const totalAvailableDays = totalCatways * 31;
+        const totalAvailableDays = totalCatways * 365;
         // Calcul du taux de fréquentation
-        const occupationRate = (totalReservedDays / totalAvailableDays) * 100;
+        const occupationRate = Math.round((totalReservedDays / totalAvailableDays) * 100);
 
       // Récupération du nombre total de réservations
       const totalReservations = await Reservation.countDocuments({});
@@ -92,7 +95,7 @@ router.get('/', private.checkJWT, async function(req, res, next) {
       mostReservedCatwayNumber,
       avgDuration,
       totalReservations,
-      totalReservedDays
+      occupationRate
     });
 
   } catch (error) {
