@@ -12,6 +12,14 @@
                 <h1 class="text-2xl font-bold">Gestion des utilisateurs</h1>
                 <div class="grid grid-cols-2">
                     <section class="col-span-2 m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg overflow-x-auto">
+                        <% if (typeof message !== 'undefined' && message) { %>
+                            <div class="flex items-center p-4 mb-4 text-sm text-green-700 bg-green-100 border-l-4 border-green-500 rounded-lg" role="alert">
+                            <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
+                            </svg>
+                            <%= message %>
+                        </div>
+                        <% } %>
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Liste des utilisateurs</h2>
                         <p class="m-3 text-blue-800">Il y a <strong><% if (users.length > 0) { %> <%= users.length %> <% } else { %>0<% } %></strong> utilisateurs dans notre base de donnée.</p>
                         
@@ -60,46 +68,38 @@
         </div>
 
 
-        <div id="createUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if ((typeof errorMessage !== 'undefined' && errorMessage) || (typeof message !== 'undefined' && message)) { %>block<% } else { %>block<% } %>">
+        <div id="createUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>block<% } else { %>hidden<% } %>">
             <div id="modalBackdrop" onclick="closeModal()" class="absolute inset-0 z-10"></div>
             <div id="modalContent" class="bg-white p-6 rounded-lg shadow-lg max-w-5xl w-full text-center z-20">
               <h2 class="text-2xl font-bold mb-4">Créer un utilisateur</h2>
-                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                <% if (typeof errorMessageCreate !== 'undefined' && errorMessageCreate) { %>
                 <div class="flex items-center p-4 mb-4 text-sm text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg" role="alert">
                   <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"></path>
                   </svg>
-                  <%= errorMessage %>
+                  <%= errorMessageCreate %>
                 </div>
                 <% } %>
-                <% if (typeof message !== 'undefined' && message) { %>
-                    <div class="flex items-center p-4 mb-4 text-sm text-green-700 bg-green-100 border-l-4 border-green-500 rounded-lg" role="alert">
-                    <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
-                    </svg>
-                    <%= message %>
-                </div>
-                <% } %>
-              <form action="/users" method="POST" class="flex flex-col gap-2">
+              <form action="/users" method="post" class="flex flex-col gap-2">
                     <div class="relative flex" id="usernameInput">
-                        <input id="username" name="text" type="text" placeholder="Nom d'utilisateur" class="w-full px-3 py-2 border rounded" >
+                        <input id="username" name="username" type="text" placeholder="Nom d'utilisateur" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.username ? session.formData.username : '' %>">
                         <i id="usernameErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                     </div>
                    
                     <div class="relative flex" id="emailInput">
-                        <input type="email" name="email" id="email" class="w-full px-3 py-2 border rounded pr-10" placeholder="Email" >
+                        <input type="email" name="email" id="email" class="w-full px-3 py-2 border rounded pr-10" placeholder="Email" value="<%= session && session.formData && session.formData.email ? session.formData.email : '' %>">
                         <i id="emailErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                     </div>
                     <div class="relative flex flex-col" id="passwordInput">
-                        <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded pr-10" placeholder="Mot de passe" >
+                        <input type="password" name="password" id="password" class="w-full px-3 py-2 border rounded pr-10" placeholder="Mot de passe">
                         <i id="passwordErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                     </div>
                     <div class="relative flex flex-col" id="confirmPasswordInput">
-                        <input type="password" name="confirmPassword" id="confirmPassword" class="w-full px-3 py-2 border rounded pr-10" placeholder="Confirmer le mot de passe" >
+                        <input type="password" name="confirmPassword" id="confirmPassword" class="w-full px-3 py-2 border rounded pr-10" placeholder="Confirmer le mot de passe">
                         <i id="confirmPasswordErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                     </div>
                     
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">Créer</button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" type="submit">Créer</button>
               </form>
               <button onclick="closeModal()" class="text-red-500 mt-4 block w-full">Annuler</button>
             </div>
@@ -112,7 +112,7 @@
             function closeModal() {
               document.getElementById("createUserModal").classList.add("hidden");
             }
-
+/*
             const checkUsername = (username) => {
                 const usernameRegex  = /^[A-Za-z]+$/;
                 return usernameRegex.test(username);
@@ -173,10 +173,10 @@
                     let isValid = true;
 
                     // Check de l'ensemble des critères
-                    isValid &= validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide (uniquement des lettres).");
-                    isValid &= validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
-                    isValid &= validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
-                    isValid &= validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
+                    isValid && validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide (uniquement des lettres).");
+                    isValid && validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
+                    isValid && validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
+                    isValid && validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
 
                     return isValid;
                 };
@@ -206,7 +206,7 @@
                     let alertDiv = document.createElement("div");
                     let contenuAlertDiv = document.createTextNode(texte); 
                     alertDiv.appendChild(contenuAlertDiv); // Mon texte est enfant de ma nouvelle div
-                    alertDiv.setAttribute("class", "text-red-700 text-sm mt-0 top-1"); // J'ajoute à ma div une class
+                    alertDiv.setAttribute("class", "text-red-700 text-sm mt-0 top-1 italic"); // J'ajoute à ma div les class
                     alertDiv.setAttribute("id", "invalid"+parametre); // ainsi qu'un ID
                     alertDiv.style.display = "flex"; // Je met à jour le style qui est par défaut sur none
                     inputForm.after(alertDiv); // Ma nouvelle div est ajoutée à la suite de l'input
@@ -227,7 +227,7 @@
                     inputErrorIcon.style.display = "none";
                 }
             }
-
+*/
           </script>
 
     </main>

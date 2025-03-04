@@ -7,11 +7,14 @@
 
 var express = require('express');
 var router = express.Router();
+const session = require('express-session'); 
 
 const service = require('../services/users');
 
 // Import du middleware pour privatisation
 const private = require('../middlewares/private');
+
+
 
 /**
  * @swagger
@@ -45,8 +48,47 @@ const private = require('../middlewares/private');
  *         description: "Erreur serveur."
  */
 router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let message = null;
+
+    // Définir le message de succès basé sur le code
+    if (successCode === "ADD") {
+        message = "Utilisateur créé avec succès.";
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "ADD_1":
+            errorMessageCreate = "Le nom d'utilisateur doit être renseigné.";
+            break;
+        case "ADD_2":
+            errorMessageCreate = "Le nom d'utilisateur ne peut contenir que des lettres.";
+            break;
+        case "ADD_3":
+            errorMessageCreate = "Adresse email invalide.";
+            break;
+        case "ADD_4":
+            errorMessageCreate = "Le mot de passe doit avoir au moins 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.";
+            break;
+        case "ADD_5":
+            errorMessageCreate = "Les mots de passe ne correspondent pas.";
+            break;
+        case "ADD_6":
+            errorMessageCreate = "Cette adresse email existe déjà dans le système.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+    console.log("Session :", req.session.formData);
+
     res.render('users', { 
-        currentPage: 'users'
+        currentPage: 'users',
+        errorMessageCreate: errorMessageCreate,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
       });
 });
 

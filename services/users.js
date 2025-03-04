@@ -67,32 +67,73 @@ exports.add = async (req, res, next) => {
     const temp = ({
         username: req.body.username,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        confirmPassword: req.body.confirmPassword
     });
 
     if (!temp.username)
     {
-        return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+        //return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+        req.session.formData = req.body;
+        return res.redirect('/users?error=ADD_1');
     }
     if (!checkUsername(temp.username)) {
-        return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
+        //return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
+        req.session.formData = { username: req.body.username, email: req.body.email };
+        return res.redirect('/users?error=ADD_2');
     }
     if (!checkEmail(temp.email)) {
-        return res.status(400).json({ error: "Adresse email invalide."});
+        //return res.status(400).json({ error: "Adresse email invalide."});
+        req.session.formData = req.body;
+        return res.redirect('/users?error=ADD_3');
     }
     if (!checkPassword(temp.password)) {
-        return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+        //return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+        req.session.formData = req.body;
+        return res.redirect('/users?error=ADD_4');
     }
     if (!checkPasswordLength(temp.password)) {
-        return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+        //return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+        req.session.formData = req.body;
+        return res.redirect('/users?error=ADD_4');
+    }
+    if (temp.password != temp.confirmPassword) {
+        //return res.status(400).json({ error: "Les mots de passe ne correspondent pas."});
+        req.session.formData = req.body;
+        return res.redirect('/users?error=ADD_5');
     }
 
     try {
         let user = await User.create(temp);
 
-        return res.status(201).json(user);
+        //return res.status(201).json(user);
+        req.session.formData = null;
+        return res.redirect('/users?success=ADD');
     } catch (error) {
-        return res.status(501).json(error)
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/users?error=ADD_6`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
