@@ -1,19 +1,120 @@
-<%- include('layout'); -%>
-<body class="min-h-screen flex flex-col">
-    <%- include('header'); -%>
-    <div class="flex flex-grow items-center justify-center">
-        <div class="bg-gray-900 bg-opacity-70 text-white p-8 rounded-lg max-w-5xl w-full text-center shadow-lg">
-            <h1 class="text-4xl font-bold mb-4">Port de Plaisance de Russell</h1>
-            
-            <p class="text-xl font-semibold mb-4">Bienvenue sur l'application de gestion des réservations de catways du port de plaisance de Russell</p>
-        
-            <p class="text-gray-300 text-lg mb-6">
-                Cette plateforme vous permet de gérer facilement les réservations des catways, ces appontements réservés pour amarrer vos bateaux. 
-                Grâce à une interface simple et intuitive, la capitainerie peut suivre en temps réel l'occupation des catways, les dates de réservation et 
-                les informations associées aux réservations. L'application offre également une gestion sécurisée des utilisateurs et une API privée pour un 
-                contrôle optimal des informations.
-            </p>
+<%- include('components/layout'); -%>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+    <%- include('components/header'); -%>
+    <main class="flex flex-1 items-center justify-center w-full">
+        <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-row overflow-y-auto" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
+
+            <!-- Sidebar (menu latéral) -->
+            <%- include('components/nav'); -%>
+
+            <!-- Main content area -->
+            <div class="flex-1 p-8 text-center">
+                <h1 class="text-2xl font-bold">Tableau de bord</h1>
+                <p class="m-3">Vous êtes connecté avec l'adresse email <%= user.email %>.
+                <div class="grid grid-cols-2">
+                    <section class="col-span-2 m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg overflow-x-auto">
+                        <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Réservations en cours</h2>
+                        <p class="m-3 text-blue-800">Il y a <strong><%= currentReservations.length %></strong> réservation en cours.</p>
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pr-3 pl-1 xl:pl-4 text-left text-xs xl:text-sm font-semibold text-gray-900 sm:pl-6">Catway N°</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Client</th>
+                                    <th scope="col" class="hidden xl:table-cell px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Bâteau</th>
+                                    <th scope="col" class="hidden xl:table-cell px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Date de départ</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <% if (currentReservations.length > 0) { currentReservations.forEach(function(reservation) { %>
+                                <tr>
+                                    <td class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6"><%= reservation.catwayNumber %></td>
+                                    <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.clientName %></td>
+                                    <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.boatName %></td>
+                                    <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.endDate.toLocaleDateString().slice(0, 10) %></td>
+                                    <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-white">
+                                        <span class="isolate inline-flex rounded-md shadow-xs">
+                                            <button type="button" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                            <button type="button" class="relative -ml-px inline-flex items-center rounded-r-md bg-red-500 px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-red-400 focus:z-10">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <% }); 
+                                } else { %> 
+                                <tr>
+                                    <td colspan="5" class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6">Aucune réservation en cours</td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </section>
+                    <div class="m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg">
+                        <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-sailboat"></i> Catways</h2>
+                        <p class="m-3 text-blue-800">Il y a <strong><%= availableCatwaysCount %></strong> catways disponibles (dont <%= availableLongCatways %> long et <%= availableShortCatways %> short).</p>
+                        <p class="m-3 text-blue-800">Actuellement, <%= availabilityPercentage %>% des catways sont disponibles.</p>
+                        <div class="center w-full h-40 flex items-center justify-center">
+                            <svg class="w-full h-full" viewBox="0 0 100 100">
+                              <!-- Background circle -->
+                              <circle
+                                class="text-gray-300 stroke-current"
+                                stroke-width="10"
+                                
+                                cx="50"
+                                cy="50"
+                                r="40"
+                                fill="transparent"
+                              ></circle>
+                              <!-- Progress circle -->
+                              <circle
+                                class="text-green-500  progress-ring__circle stroke-current"
+                                stroke-width="10"
+                                stroke-linecap="round"
+                                cx="50"
+                                cy="50"
+                                r="40"
+                                fill="transparent"
+                                id="progress-circle"
+                              ></circle>
+                              
+                              <!-- Center text -->
+                              <text x="50" y="50" text-anchor="middle" alignment-baseline="middle"><%= availabilityPercentage %>%</text>
+                          
+                            </svg>
+                        </div>
+                        <script>
+                            // Définir le pourcentage
+                            const percentage = <%= availabilityPercentage %>; // Change cette valeur pour tester différents pourcentages
+                          
+                            // Calculer la circonférence du cercle
+                            const radius = 40;
+                            const circumference = 2 * Math.PI * radius;
+                          
+                            // Calculer le dashoffset en fonction du pourcentage
+                            const offset = circumference - (circumference * percentage) / 100;
+                          
+                            // Appliquer le stroke-dashoffset
+                            document.querySelector("#progress-circle").style.strokeDasharray = circumference; // Définir la longueur du trait
+                            document.querySelector("#progress-circle").style.strokeDashoffset = offset;
+                          
+                            // Mettre à jour le texte au centre
+                            document.querySelector("#progress-text").textContent = `${percentage}%`;
+                          </script>
+                    </div>
+                    <div class="m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg">
+                        <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-chart-line"></i> Statistiques</h2>
+                        <p class="m-3 text-blue-800">Catway le plus souvent utilisé : <strong><%= mostReservedCatwayNumber %></strong></p>
+                        <p class="m-3 text-blue-800">Durée moyenne de réservation : <strong><%= avgDuration %> jours</strong></p>
+                        <p class="m-3 text-blue-800">Le taux moyen de fréquentation est de <%= occupationRate %>%.</p>
+                        <p class="m-3 text-blue-800">Notre port a enregistré <%= totalReservations %> réservations.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
-    <%- include('footer'); -%>
+    </main>
+    <%- include('components/footer'); -%>
 </body>

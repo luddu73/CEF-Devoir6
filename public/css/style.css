@@ -3,14 +3,6 @@
 @tailwind utilities;
 
 
-html, body {
-  @apply min-h-screen flex flex-col;
-  margin: 0;
-  display:flex;
-  flex-direction: column;
-  margin:0;
-}
-
 .logo {
     color:white;
     font-size:2rem;
@@ -27,6 +19,18 @@ body
     background-image: url("../img/background.jpg");
     background-position: 50% 75%;
 }
-footer{
-  @apply mt-auto w-full text-center py-8 text-white;
+@media screen and (max-width: 765px) 
+{
+  #sidebar 
+  {
+      position: fixed;
+      top: 0;
+      left: -100%;  /* Cachée à gauche de l'écran par défaut */
+      transition: left 0.3s ease;
+      z-index: 50;  /* S'assurer que la sidebar est au-dessus du contenu */
+  }
+  /* Sidebar visible */
+  #sidebar.show {
+    left: 0;
+  }
 }

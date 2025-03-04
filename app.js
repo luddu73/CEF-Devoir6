@@ -1,3 +1,7 @@
+
+process.env.TZ = process.env.TZ || "Europe/Paris";
+console.log("Fuseau horaire actif :", process.env.TZ);
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');

@@ -47,7 +47,7 @@ exports.authenticate = async (req, res, next) => {
                     res.cookie('jwt', token, {
                         httpOnly: true, // Empêche l'accès depuis JavaScript
                         secure: process.env.NODE_ENV === 'production', // Active seulement en HTTPS
-                        maxAge: expireIn, // Durée de validité
+                        maxAge: expireIn * 1000, // Durée de validité
                         sameSite: 'Strict'
                     });
                     //return res.status(200).json('Authentification réussie');

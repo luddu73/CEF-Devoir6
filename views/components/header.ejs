@@ -1,0 +1,34 @@
+<nav class="bg-blue-800">
+  <div class="mx-auto px-2 sm:px-6 lg:px-8">
+      <div class="flex h-16 items-center justify-between">
+          <!-- Pour positionner le logo à gauche -->
+          <div class="flex items-center pr-2 sm:ml-6 w-1/6">
+              <div class="flex shrink-0 items-center align-middle">
+                  <a href="/" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white">
+                      <i class="fa-solid fa-anchor logo"></i>
+                  </a>
+              </div>
+          </div>
+          <!-- Pour centrer le titre au milieu -->
+          <div class="flex-1 flex justify-center items-center">
+              <a href="/" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:text-white text-center lg:text-xl md:text-lg">
+                  PORT DE PLAISANCE DE RUSSELL
+              </a>
+          </div>
+          <!-- Nécessaire pour que le titre soit bien centré -->
+          <div class="w-1/6">
+          </div>
+      </div>
+  </div>
+  <!-- Mobile menu, show/hide based on menu state. -->
+  <% if (typeof user !== 'undefined' && user) { %>
+  <div class="xl:hidden" id="mobile-menu">
+    <div class="space-y-1 px-2 pt-2 pb-3">
+        <!-- Bouton Menu pour mobile -->
+        <button onclick="toggleSidebar()" id="sidebarButton" class="md:hidden text-white top-4 left-4 z-10">
+            ☰ Menu
+        </button>
+    </div>
+  </div>
+  <% } %>
+</nav>
