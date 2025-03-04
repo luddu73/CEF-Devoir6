@@ -113,6 +113,10 @@
               document.getElementById("createUserModal").classList.add("hidden");
             }
 
+            const checkUsername = (username) => {
+                const usernameRegex  = /^[A-Za-z]+$/;
+                return usernameRegex.test(username);
+            };
             const checkEmail = (email) => {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return emailRegex.test(email);
@@ -144,12 +148,12 @@
                 // Contrôle individuel des champs
                 if (usernameInput) {
                     usernameInput.addEventListener("input", () => {
-                        validateInput(usernameInput, value => value !== "", "username", "Vous devez saisir un nom d'utilisateur.");
+                        validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur (uniquement des lettres).");
                     });
                 }
                 if (emailInput) {
                     emailInput.addEventListener("input", () => {
-                        validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide."); // On vérifie la présentation de l'email
+                        validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide."); 
                     });
                 }
                 if (passwordInput) {
@@ -169,7 +173,7 @@
                     let isValid = true;
 
                     // Check de l'ensemble des critères
-                    isValid &= validateInput(usernameInput, value => value !== "", "username", "Vous devez saisir un nom d'utilisateur.");
+                    isValid &= validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide (uniquement des lettres).");
                     isValid &= validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
                     isValid &= validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
                     isValid &= validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
@@ -181,7 +185,7 @@
                 form.addEventListener("submit", (event) => {
                     event.preventDefault(); // Empêche l'envoi du formulaire si les champs ne sont pas tous ok
                     if (validateForm()) {
-                        form.submit(); // Si tout est valide, on soumet le formulaire
+                        form.submit(); // Si tout ok, on envois !
                     }
                 });
             });

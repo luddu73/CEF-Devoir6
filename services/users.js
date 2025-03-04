@@ -6,6 +6,19 @@
 const User = require('../models/users');
 const bcrypt = require('bcrypt');
 
+
+/**
+ * Vérifie la présentation du nom d'utilisateur (lettre Majuscule et minuscule uniquement)
+ * @async
+ * @function checkEmail
+ * @param {string} username - L'input à vérifier
+ * @returns {boolean} Retourne une réponse "true" si le nom d'utilisateur est conforme, sinon "false"
+ */
+const checkUsername = (username) => {
+    const usernameRegex  = /^[A-Za-z]+$/;
+    return usernameRegex.test(username);
+};
+
 /**
  * Vérifie la présentation de l'email
  * @async
@@ -60,6 +73,9 @@ exports.add = async (req, res, next) => {
     if (!temp.username)
     {
         return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+    }
+    if (!checkUsername(temp.username)) {
+        return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
     }
     if (!checkEmail(temp.email)) {
         return res.status(400).json({ error: "Adresse email invalide."});
@@ -153,6 +169,9 @@ exports.update = async (req, res, next) => {
     if (!temp.username)
     {
         return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+    }
+    if (!checkUsername(temp.username)) {
+        return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
     }
     if (!checkEmail(temp.email)) {
         return res.status(400).json({ error: "Adresse email invalide."});

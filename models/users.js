@@ -32,7 +32,8 @@ const User = new Schema({
     username: {
         type: String,
         trim: true,
-        required: [true, 'Un nom d\'utilisateur est requis']
+        required: [true, 'Un nom d\'utilisateur est requis'],
+        match: [/^[A-Za-z]+$/, 'Le nom d\'utilisateur n\'est pas valide.']
     },
     email: {
         type: String,
