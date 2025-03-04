@@ -44,7 +44,11 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, service.getAll);
+router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
+    res.render('users', { 
+        currentPage: 'users'
+      });
+});
 
 
 /**

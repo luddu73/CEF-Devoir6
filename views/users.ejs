@@ -1,0 +1,64 @@
+<%- include('components/layout'); -%>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+    <%- include('components/header'); -%>
+    <main class="flex flex-1 items-center justify-center w-full">
+        <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-row overflow-y-auto" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
+
+            <!-- Sidebar (menu latéral) -->
+            <%- include('components/nav'); -%>
+
+            <!-- Main content area -->
+            <div class="flex-1 p-8 text-center">
+                <h1 class="text-2xl font-bold">Gestion des utilisateurs</h1>
+                <div class="grid grid-cols-2">
+                    <section class="col-span-2 m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg overflow-x-auto">
+                        <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Liste des utilisateurs</h2>
+                        <p class="m-3 text-blue-800">Il y a <strong><% if (users.length > 0) { %> <%= users.length %> <% } else { %>0<% } %></strong> utilisateurs dans notre base de donnée.</p>
+                        
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pr-3 pl-1 xl:pl-4 text-left text-xs xl:text-sm font-semibold text-gray-900 sm:pl-6">Nom d'utilisateur</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Email</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <% if (users.length > 0) { users.forEach(function(users) { %>
+                                <tr>
+                                    <td class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6"><%= users.username %></td>
+                                    <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= users.email %></td>
+                                    <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-white">
+                                        <span class="isolate inline-flex rounded-md shadow-xs">
+                                            <button type="button" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                            <button type="button" class="relative -ml-px inline-flex items-center rounded-r-md bg-red-500 px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-red-400 focus:z-10">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <% }); 
+                                } else { %> 
+                                <tr>
+                                    <td colspan="3" class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6 text-center">Aucun utilisateur trouvé.</td>
+                                </tr>
+                                <% } %>
+                                <tr>
+                                    <td colspan="3" class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6 text-center">
+                                        <button type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                            <i class="fa-solid fa-user-plus"></i> Créer un utilisateur
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <%- include('components/footer'); -%>
+</body>

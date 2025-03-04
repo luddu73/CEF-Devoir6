@@ -94,11 +94,18 @@ exports.getAll = async (req, res, next) => {
         let users = await User.find();
 
         if (users.length > 0) {
-            return res.status(200).json(users);
+            //return res.status(200).json(users);
+            res.locals.users = users;
+            return next();
         }
 
-        return res.status(404).json('Aucun utilisateur trouvé');
+        //return res.status(404).json('Aucun utilisateur trouvé');
+        console.log("Aucun utilisateur trouvé");
+        res.locals.users = users;
+        res.errorMessage = "Aucun utilisateur trouvé";
+        return next();
     } catch (error) {
+        console.error(error);
         return res.status(501).json(error);
     }
 }
