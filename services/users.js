@@ -162,8 +162,30 @@ exports.getAll = async (req, res, next) => {
         res.errorMessage = "Aucun utilisateur trouvé";
         return next();
     } catch (error) {
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/users?error=ADD_6`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
-        return res.status(501).json(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 /**
@@ -187,7 +209,30 @@ exports.getByEmail = async (req, res, next) => {
 
         return res.status(404).json('Utilisateur non trouvé');
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/users?error=ADD_6`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 /**
@@ -240,8 +285,31 @@ exports.update = async (req, res, next) => {
 
         return res.status(404).json('Utilisateur non trouvé');
     } catch (error) {
-        return res.status(501).json(error)
-    } 
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/users?error=ADD_6`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
+    }
 }
 
 /**
@@ -255,17 +323,42 @@ exports.update = async (req, res, next) => {
  */
 exports.delete = async (req, res, next) => {
     const email = req.params.email
+    const currentSession = req.user?.email;
 
     try {
+        if (email === currentSession) {
+            console.warn(`⚠️ L'Utilisateur ${email} essais de supprimer son propre compte.`);
+            return res.json({success: false, errorInfo: "DEL_2"});
+        }
+
         let user = await User.findOne({ email: email });
         
         if (user) {
             await User.deleteOne({email: email});
-            return res.status(200).json('Utilisateur supprimé');
+            return res.json({success: true});
         }
-        return res.status(404).json('Utilisateur non trouvé');
+        console.warn(`Utilisateur ${email} non trouvé.`);
+        return res.json({success: false, errorInfo: "DEL_1"}); // Utilisateur non trouvé
 
     } catch (error) {
-        return res.status(501).json(error)
-    } 
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
+    }
 }

@@ -69,4 +69,14 @@ router.post('/login', service.authenticate);
  */
 router.get('/logout', service.logout);
 
+router.get('/error', (req, res) => {
+  const { errorCode, title, message } = req.query;
+  
+  res.render('error', {
+      errorCode: errorCode || '500',
+      title: title || 'Erreur inconnue',
+      message: message || 'Une erreur est survenue.',
+  });
+});
+
 module.exports = router;

@@ -118,12 +118,12 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+  const { errorCode, title, message } = req.params;
   // render the error page
   res.status(err.status || 500).render('error', {
-    errorCode: `${err.status || 500}`,
-    title: `${err.message || "Erreur"}`,
-    message: "Une erreur est survenue. Veuillez réessayer plus tard."
+    errorCode: `${err.status || errorCode || 500}`,
+    title: `${err.message || title || "Erreur"}`,
+    message: message || "Une erreur est survenue. Veuillez réessayer plus tard."
   });
 });
 

@@ -54,8 +54,13 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
     let message = null;
 
     // Définir le message de succès basé sur le code
-    if (successCode === "ADD") {
-        message = "Utilisateur créé avec succès.";
+    switch (successCode) {
+        case "ADD":
+            message = "Utilisateur créé avec succès.";
+            break;
+        case "DEL":
+            message = "Utilisateur supprimé";
+            break;
     }
 
     // Définir le message d'erreur basé sur le code
@@ -77,6 +82,12 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
             break;
         case "ADD_6":
             errorMessageCreate = "Cette adresse email existe déjà dans le système.";
+            break;
+        case "DEL_1":
+            errorMessage = "L'utilisateur à supprimer n'a pas été trouvé dans le système.";
+            break;
+        case "DEL_2":
+            errorMessage = "Vous ne pouvez pas supprimer votre propre compte.";
             break;
         default:
             errorMessageCreate = errorCode;
