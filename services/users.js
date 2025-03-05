@@ -204,16 +204,13 @@ exports.getByEmail = async (req, res, next) => {
         let user = await User.findOne({ email });
 
         if (user) {
-            return res.status(200).json(user);
+            //return res.status(200).json(user);
+            res.locals.user = user;
+            return next();
         }
 
-        return res.status(404).json('Utilisateur non trouvé');
+        return res.redirect(`/users?error=USR_1`);
     } catch (error) {
-        // Code erreur de MongoDB de duplication
-        if (error.code === 11000) {
-            req.session.formData = req.body;
-            return res.redirect(`/users?error=ADD_6`);
-        }
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
             console.error(error);
             req.session.formData = null;

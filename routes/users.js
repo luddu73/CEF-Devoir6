@@ -89,6 +89,9 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
         case "DEL_2":
             errorMessage = "Vous ne pouvez pas supprimer votre propre compte.";
             break;
+        case "USR_1":
+            errorMessage = "L'utilisateur souhaité est introuvable.";
+            break;
         default:
             errorMessageCreate = errorCode;
             break;
@@ -142,7 +145,19 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:email', private.checkJWT, service.getByEmail);
+router.get('/:email', private.checkJWT, service.getByEmail, function(req, res, next) {
+    
+    let errorMessage = null;
+    let message = null;
+
+    res.render('user', { 
+        currentPage: 'users',
+        backPage: 'users',
+        errorMessage: errorMessage,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger
