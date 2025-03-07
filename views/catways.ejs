@@ -77,7 +77,7 @@
         </div>
 
 
-        <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if (typeof errorMessageCreate !== 'undefined' && errorMessageCreate) { %>block<% } else { %>block<% } %>">
+        <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if (typeof errorMessageCreate !== 'undefined' && errorMessageCreate) { %>block<% } else { %>hidden<% } %>">
             <div id="modalBackdrop" onclick="closeModal()" class="absolute inset-0 z-10"></div>
             <div id="modalContent" class="bg-white p-6 rounded-lg shadow-lg max-w-5xl w-full text-center z-20">
               <h2 class="text-2xl font-bold mb-4">Créer un catway</h2>
@@ -91,23 +91,23 @@
                 <% } %>
               <form action="/catways" method="post" class="flex flex-col gap-2">
                     <div class="relative flex" id="numberInput">
-                        <input id="catwayNumber" name="catwayNumber" type="number" placeholder="Numéro de catway" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.catwayNumber ? session.formData.catwayNumber : '' %>">
+                        <input id="catwayNumber" name="catwayNumber" type="number" placeholder="Numéro de catway" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.catwayNumber ? session.formData.catwayNumber : '' %>" required>
                     </div>
                     <div class="relative flex" id="typeInput">
                         <div class="space-y-6 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
                             <legend class="text-sm/6 font-semibold text-gray-900">Type de catway</legend>
                             <div class="flex items-center">
-                                <input id="court" name="catwayType" type="radio" checked class="relative size-4 rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden">
+                                <input id="catwayType" name="catwayType" value="short" type="radio" checked class="relative size-4 rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden" required>
                                 <label for="court" class="ml-3 block text-sm/6 font-medium text-gray-900">Court</label>
                             </div>
                             <div class="flex items-center">
-                                <input id="long" name="catwayType" type="radio" class="relative size-4 rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden">
+                                <input id="catwayType" name="catwayType" value="long" type="radio" class="relative size-4 rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden">
                                 <label for="long" class="ml-3 block text-sm/6 font-medium text-gray-900">Long</label>
                             </div>
                         </div>
                     </div>
                     <div class="relative flex flex-col" id="stateInput">
-                        <input type="text" name="catwayState" id="catwayState" class="w-full px-3 py-2 border rounded pr-10" placeholder="Etat du catway">
+                        <input type="text" name="catwayState" id="catwayState" class="w-full px-3 py-2 border rounded pr-10" placeholder="Etat du catway" required>
                     </div>
                     
                     <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" type="submit">Créer</button>

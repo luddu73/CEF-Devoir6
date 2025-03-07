@@ -59,6 +59,31 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
     let errorMessageCreate = null;
     let message = null;
 
+    switch (successCode) {
+        case "ADD":
+            message = "Catway crée avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "ADD_1":
+            errorMessageCreate = "Le catway doit être un nombre entier supérieur à 0.";
+            break;
+        case "ADD_2":
+            errorMessageCreate = "Le catway ne peut être que long, ou court.";
+            break;
+        case "ADD_3":
+            errorMessageCreate = "Ce numéro de catway existe déjà.";
+            break;
+        case "ADD_4":
+            errorMessageCreate = "Un état de catway doit être précisé.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+
     res.render('catways', { 
         currentPage: 'catways',
         errorMessageCreate: errorMessageCreate,
