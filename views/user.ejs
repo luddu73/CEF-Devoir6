@@ -31,25 +31,42 @@
                                 <% } %>
                             </div>
                         <h2 class="text-blue-900 text-lg font-bold mb-3"><i class="fa-solid fa-user"></i> Utilisateur <%= user.username %></h2>
-                        <button onclick="" id="modifyButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <button onclick="launchModify()" id="modifyButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <i class="fa-solid fa-pen"></i> Modifier
                         </button>
+                        <script>
+                            function launchModify() {
+                                const modifyButton = document.getElementById("modifyButton");
+                                const modifyPasswordButton = document.getElementById("modifyPasswordButton");
+                                const username = document.getElementById("username");
+                                const email = document.getElementById("email");
+                                const submitButton = document.getElementById("submitButton");
+                                
+                                modifyButton.setAttribute("class", "hidden"); 
+                                modifyPasswordButton.removeAttribute("disabled"); 
+                                username.removeAttribute("disabled"); 
+                                email.removeAttribute("disabled"); 
+                                submitButton.classList.remove("hidden"); 
+                                modifyPasswordButton.classList.remove("cursor-not-allowed"); 
+                                modifyPasswordButton.classList.remove("opacity-50"); 
+                            }
+                        </script>
                         <div class="flex items-center justify-center">
-                            <form method="put" class="flex flex-col gap-2 m-3 p-3 w-2/4 text-center">
+                            <form action="/users/<%= user.email %>?_method=PUT" method="post"  class="flex flex-col gap-2 m-3 p-3 w-2/4 text-center">
                                 <div class="flex flex-col gap-2 flex-wrap text-black">
                                     <div class="relative flex" id="usernameInput">
                                         <label for="username" class="w-1/2">Nom d'utilisateur</label>
-                                        <input id="username" name="username" type="text" placeholder="Nom d'utilisateur" class="px-3 py-2 border rounded w-1/2" value="<%= user.username %>" disabled>
+                                        <input id="username" name="username" type="text" placeholder="Nom d'utilisateur" class="px-3 py-2 border rounded w-1/2" value="<%= user.username %>" disabled required>
                                         <i id="usernameErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                                     </div>
                                     <div class="relative flex" id="emailInput">
                                         <label for="email" class="w-1/2">Adresse email</label>
-                                        <input type="email" name="email" id="email" class="px-3 py-2 border rounded pr-10 w-1/2" placeholder="Email" value="<%= user.email %>" disabled>
+                                        <input type="email" name="email" id="email" class="px-3 py-2 border rounded pr-10 w-1/2" placeholder="Email" value="<%= user.email %>" disabled required>
                                         <i id="emailErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                                     </div>
                                     <div class="relative flex">
                                         <div class="w-1/3 m-auto">
-                                            <button disabled onclick="" id="modifyButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-red-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 cursor-not-allowed opacity-50">
+                                            <button disabled onclick="modifyPassword()" id="modifyPasswordButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-red-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 cursor-not-allowed opacity-50">
                                                 <i class="fa-solid fa-key"></i> Changer le mot de passe
                                             </button>
                                         </div>
@@ -65,9 +82,139 @@
                                                 <i id="confirmPasswordErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                                             </div>
                                         </div>
+                                        <script>
+                                            function modifyPassword() {
+                                                const modifyButton = document.getElementById("modifyButton");
+                                                const password = document.getElementById("password");
+                                                const confirmPassword = document.getElementById("confirmPassword");
+                                                
+                                                modifyButton.setAttribute("class", "hidden"); 
+                                                password.removeAttribute("disabled"); 
+                                                password.setAttribute("required","true"); 
+                                                confirmPassword.removeAttribute("disabled"); 
+                                                confirmPassword.setAttribute("required","true"); 
+                                            }
+                                            
+
+                                            const checkUsername = (username) => {
+                                                const usernameRegex  = /^[A-Za-z]+$/;
+                                                return usernameRegex.test(username);
+                                            };
+                                            const checkEmail = (email) => {
+                                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                                return emailRegex.test(email);
+                                            };
+                                            const checkPassword = (password) => {
+                                                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+                                                return passwordRegex.test(password);
+                                            };
+                                            const checkPasswordLength = (password) => {
+                                                return password.length >= 8;
+                                            };
+
+                                            document.addEventListener("DOMContentLoaded", () => {
+                                                const form = document.querySelector("form");
+                                                const usernameInput = document.getElementById("username");
+                                                const emailInput = document.getElementById("email");
+                                                const passwordInput = document.getElementById("password");
+                                                const confirmPassword = document.getElementById("confirmPassword");
+
+                                                // Fonction pour valider un champ individuellement
+                                                const validateInput = (inputElement, validationFunction, errorId, errorMessage) => {
+                                                    if (!validationFunction(inputElement.value)) {
+                                                        addErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`, `${inputElement.id}Input`, errorMessage);
+                                                    } else {
+                                                        removeErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`);
+                                                    }
+                                                };
+
+                                                // Contrôle individuel des champs
+                                                if (usernameInput) {
+                                                    usernameInput.addEventListener("input", () => {
+                                                        validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur (uniquement des lettres).");
+                                                    });
+                                                }
+                                                if (emailInput) {
+                                                    emailInput.addEventListener("input", () => {
+                                                        validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide."); 
+                                                    });
+                                                }
+                                                if (passwordInput) {
+                                                    passwordInput.addEventListener("input", () => {
+                                                        validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
+                                                    });
+                                                }
+                                                if (confirmPassword) {
+                                                    confirmPassword.addEventListener("input", () => {
+                                                        validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
+                                                    });
+                                                }
+
+
+                                                // On vérifie le formulaire avant envoi
+                                                const validateForm = () => {
+                                                    let isValid = true;
+
+                                                    // Check de l'ensemble des critères
+                                                    isValid && validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide (uniquement des lettres).");
+                                                    isValid && validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
+                                                    isValid && validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
+                                                    isValid && validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
+
+                                                    return isValid;
+                                                };
+
+                                                // Écouteur sur le submit du formulaire
+                                                form.addEventListener("submit", (event) => {
+                                                    event.preventDefault(); // Empêche l'envoi du formulaire si les champs ne sont pas tous ok
+                                                    if (validateForm()) {
+                                                        form.submit(); // Si tout ok, on envois !
+                                                    }
+                                                });
+                                            });
+
+
+
+                                            function addErrorInfo(parametre,parametreIcon,parametreForm,texte) // Fonction qui permet d'ajouter une information d'erreur sur le formulaire
+                                            {
+                                                let input = document.getElementById(parametre);
+                                                let inputErrorIcon = document.getElementById(parametreIcon);
+                                                let inputForm = document.getElementById(parametreForm);
+                                                if ( inputErrorIcon.style.display === "none")
+                                                {   
+                                                    input.classList.add("border-red-500");
+                                                    input.classList.add("text-red-500");
+                                                    inputErrorIcon.style.display = "inline-block";
+                                                        
+                                                    let alertDiv = document.createElement("div");
+                                                    let contenuAlertDiv = document.createTextNode(texte); 
+                                                    alertDiv.appendChild(contenuAlertDiv); // Mon texte est enfant de ma nouvelle div
+                                                    alertDiv.setAttribute("class", "text-red-700 text-sm mt-0 top-1 italic"); // J'ajoute à ma div les class
+                                                    alertDiv.setAttribute("id", "invalid"+parametre); // ainsi qu'un ID
+                                                    alertDiv.style.display = "flex"; // Je met à jour le style qui est par défaut sur none
+                                                    inputForm.after(alertDiv); // Ma nouvelle div est ajoutée à la suite de l'input
+                                                    pasok = 1;
+                                                }
+                                            }
+                                            function removeErrorInfo(parametre,parametreIcon) // Fonction qui retire l'information d'erreur sur le formulaire
+                                            {
+                                                let input = document.getElementById(parametre);
+                                                let inputErrorIcon = document.getElementById(parametreIcon);
+                                                if(document.getElementById('invalid'+parametre)) // Si le nom n'est pas vide et un élement à cet ID
+                                                {
+                                                    let invalidDiv = document.getElementById("invalid"+parametre); // Je récupère la div 
+                                                    invalidDiv.remove(); // et l'a supprime
+
+                                                    input.classList.remove("border-red-500");
+                                                    input.classList.remove("text-red-500");
+                                                    inputErrorIcon.style.display = "none";
+                                                }
+                                            }
+
+                                        </script>
+                                        </script>
                                     </div>
-                                
-                                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full hidden" type="submit"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+                                    <button id="submitButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full hidden" type="submit"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
                                 </div>
                             </form>
                         </div>

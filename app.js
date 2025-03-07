@@ -10,6 +10,7 @@ var logger = require('morgan');
 var { swaggerUi, swaggerDocs, swaggerUiOptions } = require("./swaggerConfig");
 var cors = require('cors'); // Pour sécurisé la réception des données sur l'API
 const session = require('express-session'); 
+const methodOverride = require('method-override');
 
 var mongodb = require('./db/mongo');
 
@@ -90,6 +91,7 @@ app.use((req, res, next) => {
 });
 
 app.use(logger('dev'));
+app.use(methodOverride('_method'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

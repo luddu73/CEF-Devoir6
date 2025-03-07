@@ -75,7 +75,7 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
             errorMessageCreate = "Adresse email invalide.";
             break;
         case "ADD_4":
-            errorMessageCreate = "Le mot de passe doit avoir au moins 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.";
+            errorMessageCreate = "Le mot de passe doit avoir au moins 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.";
             break;
         case "ADD_5":
             errorMessageCreate = "Les mots de passe ne correspondent pas.";
@@ -147,8 +147,42 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
  */
 router.get('/:email', private.checkJWT, service.getByEmail, function(req, res, next) {
     
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
     let errorMessage = null;
     let message = null;
+
+    // Définir le message de succès basé sur le code
+    switch (successCode) {
+        case "UPD":
+            message = "Utilisateur modifié avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "UPD_1":
+            errorMessage = "Le nom d'utilisateur doit être renseigné.";
+            break;
+        case "UPD_2":
+            errorMessage = "Le nom d'utilisateur ne peut contenir que des lettres.";
+            break;
+        case "UPD_3":
+            errorMessage = "Adresse email invalide.";
+            break;
+        case "UPD_4":
+            errorMessage = "Le mot de passe doit avoir au moins 8 caractères dont 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.";
+            break;
+        case "UPD_5":
+            errorMessage = "Les mots de passe ne correspondent pas.";
+            break;
+        case "UPD_6":
+            errorMessage = "Cette adresse email existe déjà dans le système.";
+            break;
+        default:
+            errorMessage = errorCode;
+            break;
+    }
 
     res.render('user', { 
         currentPage: 'users',

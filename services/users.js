@@ -246,46 +246,62 @@ exports.update = async (req, res, next) => {
     const temp = ({
         username: req.body.username,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        confirmPassword: req.body.confirmPassword
     });
 
     if (!temp.username)
     {
-        return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+        return res.redirect(`/users/${email}?error=UPD_1`);
+       // return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
     }
     if (!checkUsername(temp.username)) {
-        return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
+        return res.redirect(`/users/${email}?error=UPD_2`);
+        //return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
     }
     if (!checkEmail(temp.email)) {
-        return res.status(400).json({ error: "Adresse email invalide."});
+        return res.redirect(`/users/${email}?error=UPD_3`);
+        //return res.status(400).json({ error: "Adresse email invalide."});
     }
-    if (!checkPassword(temp.password)) {
-        return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+    if (temp.password && !checkPassword(temp.password)) {
+        return res.redirect(`/users/${email}?error=UPD_4`);
+        //return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
     }
-    if (!checkPasswordLength(temp.password)) {
-        return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+    if (temp.password && !checkPasswordLength(temp.password)) {
+        return res.redirect(`/users/${email}?error=UPD_4`);
+        //return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+    }
+    if (temp.password != temp.confirmPassword) {
+        return res.redirect(`/users/${email}?error=UPD_5`);
+        //return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
     }
 
     try {
         let user = await User.findOne({email : email});
 
         if (user) {
-            Object.keys(temp).forEach((key) => {
-                if (!!temp[key]) {
-                    user[key] = temp[key];
-                }
-            });
+            if (!temp.password) {
+                delete temp.password;
+            }
+            Object.assign(user, temp);
 
-            await user.save();
-            return res.status(201).json(user);
+            if (req.session.email === req.params.email)
+            {
+                req.session.user = temp.username;
+                req.session.email = temp.email;
+            }
+
+            await user.save({ validateModifiedOnly: true });
+            //return res.status(201).json(user);
+            return res.redirect(`/users/${temp.email}?success=UPD`);
         }
-
-        return res.status(404).json('Utilisateur non trouvé');
+        return res.redirect('/users?error=USR_1');
+        //return res.status(404).json('Utilisateur non trouvé');
     } catch (error) {
         // Code erreur de MongoDB de duplication
         if (error.code === 11000) {
             req.session.formData = req.body;
-            return res.redirect(`/users?error=ADD_6`);
+            return res.redirect(`/users/${email}?error=UPD_6`);
         }
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
             console.error(error);
