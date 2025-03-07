@@ -63,6 +63,9 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
         case "ADD":
             message = "Catway crée avec succès.";
             break;
+        case "DEL":
+            message = "Catway supprimé avec succès.";
+            break;
     }
 
     // Définir le message d'erreur basé sur le code
@@ -78,6 +81,9 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
             break;
         case "ADD_4":
             errorMessageCreate = "Un état de catway doit être précisé.";
+            break;
+        case "DEL_1":
+            errorMessage = "Catway introuvable.";
             break;
         default:
             errorMessageCreate = errorCode;
