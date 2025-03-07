@@ -12,54 +12,60 @@
                 <h1 class="text-2xl font-bold">Gestion des catways</h1>
                 <div class="grid grid-cols-2">
                     <section class="col-span-2 m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg overflow-x-auto" style="height: calc(75vh - 75px);">
-                            <div class="flex items-center p-4 mb-4 text-sm text-green-700 bg-green-100 border-l-4 border-green-500 rounded-lg <% if (typeof message !== 'undefined' && message) { %> block <% } else { %>hidden<% } %> " role="alert">
+                        <section>
+                                <div class="flex items-center p-4 mb-4 text-sm text-green-700 bg-green-100 border-l-4 border-green-500 rounded-lg <% if (typeof message !== 'undefined' && message) { %> block <% } else { %>hidden<% } %> " role="alert">
+                                    <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <% if (typeof message !== 'undefined' && message) { %>
+                                        <%= message %>
+                                        <% message = null; %>
+                                    <% } %>
+                                </div>
+                                <div class="flex items-center p-4 mb-4 text-sm text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg <% if (typeof errorMessage !== 'undefined' && errorMessage) { %> block <% } else { %>hidden<% } %>" role="alert">
                                 <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"></path>
                                 </svg>
-                                <% if (typeof message !== 'undefined' && message) { %>
-                                    <%= message %>
-                                    <% message = null; %>
+                                    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                                        <%= errorMessage %>
+                                        <% errorMessage = null; %>
+                                    <% } %>
+                                </div>
+                            <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-sailboat"></i> Catway N°<%= catways.catwayNumber %> 
+                                <% if  (catways.catwayType == "long") { %>
+                                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">Long</span>
+                                <% } else { %>
+                                    <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">Court</span>
                                 <% } %>
-                            </div>
-                            <div class="flex items-center p-4 mb-4 text-sm text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg <% if (typeof errorMessage !== 'undefined' && errorMessage) { %> block <% } else { %>hidden<% } %>" role="alert">
-                              <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"></path>
-                              </svg>
-                                <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-                                    <%= errorMessage %>
-                                    <% errorMessage = null; %>
-                                <% } %>
-                            </div>
-                        <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-sailboat"></i> Catway N°<%= catways.catwayNumber %> 
-                            <% if  (catways.catwayType == "long") { %>
-                                <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">Long</span>
-                            <% } else { %>
-                                <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">Court</span>
-                            <% } %>
-                        </h2>
-                        <p class="m-3 text-blue-800" id="textState"><%= catways.catwayState %></p>
-                        <button onclick="launchModify()" id="modifyButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                            <i class="fa-solid fa-pen"></i> Modifier
-                        </button>
-                        <form action="/catways/<%= catways.catwayNumber %>?_method=PUT" method="post">
-                            <input id="catwayState" name="catwayState" type="text" placeholder="Etat du catway" class="text-blue-800 px-3 py-2 border rounded hidden" value="<%= catways.catwayState %>" required>
-                            <button id="submitButton" type="submit" class="hidden inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                <i class="fa-solid fa-save"></i> Enregistrer
+                            </h2>
+                            <p class="m-3 text-blue-800" id="textState"><%= catways.catwayState %></p>
+                            <button onclick="launchModify()" id="modifyButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                <i class="fa-solid fa-pen"></i> Modifier
                             </button>
-                        </form>
-                        <script>
-                            function launchModify() {
-                                const modifyButton = document.getElementById("modifyButton");
-                                const submitButton = document.getElementById("submitButton");
-                                const textState = document.getElementById("textState");
-                                const catwayState = document.getElementById("catwayState");
-                                
-                                modifyButton.setAttribute("class", "hidden"); 
-                                textState.setAttribute("class", "hidden"); 
-                                catwayState.classList.remove("hidden");
-                                submitButton.classList.remove("hidden");
-                            }
-                        </script>
+                            <form action="/catways/<%= catways.catwayNumber %>?_method=PUT" method="post">
+                                <input id="catwayState" name="catwayState" type="text" placeholder="Etat du catway" class="text-blue-800 px-3 py-2 border rounded hidden" value="<%= catways.catwayState %>" required>
+                                <button id="submitButton" type="submit" class="hidden inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    <i class="fa-solid fa-save"></i> Enregistrer
+                                </button>
+                            </form>
+                            <script>
+                                function launchModify() {
+                                    const modifyButton = document.getElementById("modifyButton");
+                                    const submitButton = document.getElementById("submitButton");
+                                    const textState = document.getElementById("textState");
+                                    const catwayState = document.getElementById("catwayState");
+                                    
+                                    modifyButton.setAttribute("class", "hidden"); 
+                                    textState.setAttribute("class", "hidden"); 
+                                    catwayState.classList.remove("hidden");
+                                    submitButton.classList.remove("hidden");
+                                }
+                            </script>
+                            </section>
+                            <hr>
+                            <section>
+                                <h2 class="mt-2 text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Liste des réservations du catway N°<%= catways.catwayNumber %> </h2>
+                            </section>
                     </section>
                 </div>
             </div>
