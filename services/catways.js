@@ -180,8 +180,12 @@ exports.add = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     const id = req.params.id
     const temp = ({
-        catwayState: req.body.state
+        catwayState: req.body.catwayState
     });
+
+    if (!temp.catwayState) {
+        return res.redirect(`/catways/${id}?error=UPD_1`);
+    }
 
     try {
         let catway = await Catway.findOne({catwayNumber : id});
@@ -194,13 +198,31 @@ exports.update = async (req, res, next) => {
             });
 
             await catway.save();
-            return res.status(201).json(catway);
+            return res.redirect(`/catways/${id}?success=UPD`);
         }
 
-        return res.status(404).json('Catway non trouvé');
+        return res.redirect('/catways?error=UDP_1');
     } catch (error) {
-        return res.status(501).json(error)
-    } 
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
+    }
 }
 
 /**

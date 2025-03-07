@@ -149,14 +149,14 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
 
     switch (successCode) {
         case "UPD":
-            message = "Catway crée avec succès.";
+            message = "Catway modifié avec succès.";
             break;
     }
 
     // Définir le message d'erreur basé sur le code
     switch (errorCode) {
         case "UPD_1":
-            errorMessage = "Le catway doit être un nombre entier supérieur à 0.";
+            errorMessage = "Vous devez renseigner un état.";
             break;
         default:
             errorMessage = errorCode;
