@@ -53,7 +53,19 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, service.getAll);
+router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let message = null;
+
+    res.render('catways', { 
+        currentPage: 'catways',
+        errorMessageCreate: errorMessageCreate,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 
 /**

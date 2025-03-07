@@ -96,7 +96,6 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
             errorMessageCreate = errorCode;
             break;
     }
-    console.log("Session :", req.session.formData);
 
     res.render('users', { 
         currentPage: 'users',

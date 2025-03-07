@@ -16,15 +16,38 @@ const Catway = require('../models/catways');
  */
 exports.getAll = async (req, res, next) => {
     try {
-        let catways = await Catway.find();
+        let catways = await Catway.find().sort({ catwayNumber: 1 });
 
         if (catways.length > 0) {
-            return res.status(200).json(catways);
+           // return res.status(200).json(catways);
+            res.locals.catways = catways;
+            return next();
         }
-
-        return res.status(404).json('Aucun catways trouvé');
+        console.log("Aucun catways trouvé");
+        res.locals.catways = 0;
+        res.errorMessage = "Aucun catways trouvé";
+        return next();
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
