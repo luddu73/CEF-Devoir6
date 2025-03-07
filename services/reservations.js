@@ -116,15 +116,38 @@ exports.checkReservationExists = async (req, res, next) => {
  */
 exports.getAll = async (req, res, next) => {
     try {
-        let reservations = await Reservation.find();
+        let reservations = await Reservation.find().sort({ endDate:-1, startDate:-1 });
 
         if (reservations.length > 0) {
-            return res.status(200).json(reservations);
+            res.locals.reservations = reservations;
+            return next();
         }
 
-        return res.status(404).json('Aucune réservation trouvée');
+        console.log("Aucune réservation trouvée");
+        res.locals.users = users;
+        res.errorMessage = "Aucune réservation trouvée";
+        return next();
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 

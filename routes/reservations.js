@@ -43,7 +43,36 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, serviceReservation.getAll);
+router.get('/', private.checkJWT, serviceReservation.getAll, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let message = null;
+
+    // Définir le message de succès basé sur le code
+    switch (successCode) {
+        case "ADD":
+            message = "Utilisateur créé avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "ADD_1":
+            errorMessageCreate = "Le nom d'utilisateur doit être renseigné.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+
+    res.render('reservations', { 
+        currentPage: 'reservations',
+        errorMessageCreate: errorMessageCreate,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger
