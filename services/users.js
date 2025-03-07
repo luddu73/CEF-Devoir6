@@ -163,10 +163,6 @@ exports.getAll = async (req, res, next) => {
         return next();
     } catch (error) {
         // Code erreur de MongoDB de duplication
-        if (error.code === 11000) {
-            req.session.formData = req.body;
-            return res.redirect(`/users?error=ADD_6`);
-        }
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
             console.error(error);
             req.session.formData = null;

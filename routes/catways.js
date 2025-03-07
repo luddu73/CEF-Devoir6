@@ -53,7 +53,53 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, service.getAll);
+router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let message = null;
+
+    switch (successCode) {
+        case "ADD":
+            message = "Catway crée avec succès.";
+            break;
+        case "DEL":
+            message = "Catway supprimé avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "ADD_1":
+            errorMessageCreate = "Le catway doit être un nombre entier supérieur à 0.";
+            break;
+        case "ADD_2":
+            errorMessageCreate = "Le catway ne peut être que long, ou court.";
+            break;
+        case "ADD_3":
+            errorMessageCreate = "Ce numéro de catway existe déjà.";
+            break;
+        case "ADD_4":
+            errorMessageCreate = "Un état de catway doit être précisé.";
+            break;
+        case "DEL_1":
+            errorMessage = "Catway introuvable.";
+            break;
+        case "UPD_1":
+            errorMessage = "Catway introuvable.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+
+    res.render('catways', { 
+        currentPage: 'catways',
+        errorMessageCreate: errorMessageCreate,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 
 /**
@@ -95,7 +141,35 @@ router.get('/', private.checkJWT, service.getAll);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id', private.checkJWT, service.getById);
+router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessage = null;
+    let message = null;
+
+    switch (successCode) {
+        case "UPD":
+            message = "Catway modifié avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "UPD_1":
+            errorMessage = "Vous devez renseigner un état.";
+            break;
+        default:
+            errorMessage = errorCode;
+            break;
+    }
+
+    res.render('catway', { 
+        currentPage: 'catways',
+        errorMessage: errorMessage,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger
