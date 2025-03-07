@@ -142,6 +142,7 @@
         
 
         <script>
+            
             function openModal() {
               document.getElementById("createUserModal").classList.remove("hidden");
             }
@@ -218,8 +219,10 @@
                 const validateInput = (inputElement, validationFunction, errorId, errorMessage) => {
                     if (!validationFunction(inputElement.value)) {
                         addErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`, `${inputElement.id}Input`, errorMessage);
+                        return false;
                     } else {
                         removeErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`);
+                        return true;
                     }
                 };
 
@@ -250,20 +253,22 @@
                 const validateForm = () => {
                     let isValid = true;
 
-                    // Check de l'ensemble des critères
-                    isValid && validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide (uniquement des lettres).");
-                    isValid && validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
-                    isValid && validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
-                    isValid && validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
-
+                    if (!validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide.")) isValid = false;
+                    if (!validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.")) isValid = false;
+                    if (!validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères.")) isValid = false;
+                    if (!validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.")) isValid = false;
                     return isValid;
                 };
 
                 // Écouteur sur le submit du formulaire
                 form.addEventListener("submit", (event) => {
                     event.preventDefault(); // Empêche l'envoi du formulaire si les champs ne sont pas tous ok
+                    console.log("Validation en cours... ...");
                     if (validateForm()) {
+                        console.log("Validation réussie.");
                         form.submit(); // Si tout ok, on envois !
+                    } else {
+                        console.log("Validation échouée. Formulaire non envoyé.");
                     }
                 });
             });
@@ -305,7 +310,6 @@
                     inputErrorIcon.style.display = "none";
                 }
             }
-
           </script>
 
     </main>

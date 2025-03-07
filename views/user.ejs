@@ -84,15 +84,15 @@
                                         </div>
                                         <script>
                                             function modifyPassword() {
-                                                const modifyButton = document.getElementById("modifyButton");
+                                                const modifyPasswordButton = document.getElementById("modifyPasswordButton");
                                                 const password = document.getElementById("password");
                                                 const confirmPassword = document.getElementById("confirmPassword");
                                                 
-                                                modifyButton.setAttribute("class", "hidden"); 
                                                 password.removeAttribute("disabled"); 
                                                 password.setAttribute("required","true"); 
                                                 confirmPassword.removeAttribute("disabled"); 
                                                 confirmPassword.setAttribute("required","true"); 
+                                                modifyPasswordButton.setAttribute("data-password-required", "true");
                                             }
                                             
 
@@ -123,8 +123,10 @@
                                                 const validateInput = (inputElement, validationFunction, errorId, errorMessage) => {
                                                     if (!validationFunction(inputElement.value)) {
                                                         addErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`, `${inputElement.id}Input`, errorMessage);
+                                                        return false;
                                                     } else {
                                                         removeErrorInfo(inputElement.id, `${inputElement.id}ErrorIcon`);
+                                                        return true;
                                                     }
                                                 };
 
@@ -156,11 +158,13 @@
                                                     let isValid = true;
 
                                                     // Check de l'ensemble des critères
-                                                    isValid && validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide (uniquement des lettres).");
-                                                    isValid && validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.");
-                                                    isValid && validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères dont 1 Majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.");
-                                                    isValid && validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.");
-
+                                                    if (!validateInput(usernameInput, value => value !== "" && checkUsername(value), "username", "Vous devez saisir un nom d'utilisateur valide.")) isValid = false;
+                                                    if (!validateInput(emailInput, checkEmail, "email", "La présentation de votre email n'est pas valide.")) isValid = false;
+                                                    const modifyPasswordButton = document.getElementById("modifyPasswordButton");
+                                                    if (modifyPasswordButton.getAttribute("data-password-required") === "true") {
+                                                        if (!validateInput(passwordInput, value => checkPassword(value) && checkPasswordLength(value), "password", "Votre mot de passe doit avoir minimum 8 caractères.")) isValid = false;
+                                                        if (!validateInput(confirmPassword, value => passwordInput.value === value, "confirmPassword", "Les mots de passe ne correspondent pas.")) isValid = false;
+                                                    }
                                                     return isValid;
                                                 };
 
