@@ -85,6 +85,9 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
         case "DEL_1":
             errorMessage = "Catway introuvable.";
             break;
+        case "UPD_1":
+            errorMessage = "Catway introuvable.";
+            break;
         default:
             errorMessageCreate = errorCode;
             break;
@@ -138,7 +141,35 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id', private.checkJWT, service.getById);
+router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessage = null;
+    let message = null;
+
+    switch (successCode) {
+        case "UPD":
+            message = "Catway crée avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "UPD_1":
+            errorMessage = "Le catway doit être un nombre entier supérieur à 0.";
+            break;
+        default:
+            errorMessage = errorCode;
+            break;
+    }
+
+    res.render('catway', { 
+        currentPage: 'catways',
+        errorMessage: errorMessage,
+        message: message,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger
