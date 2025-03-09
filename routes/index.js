@@ -7,7 +7,13 @@ const private = require('../middlewares/private');
 router.get('/', private.checkJWT, function(req, res, next) {
   const errorMessage = "";
   const message = "";
-  res.render('index', { title: 'Express' });
+  res.render('index');
+});
+
+router.get('/legals', private.checkJWT, function(req, res, next) {
+  const errorMessage = "";
+  const message = "";
+  res.render('legals');
 });
 
 const service = require('../services/access');
