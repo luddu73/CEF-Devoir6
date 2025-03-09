@@ -1,0 +1,102 @@
+<%- include('components/layout'); -%>
+<body class="min-h-screen flex flex-col">
+    <%- include('components/header'); -%>
+    <main class="flex flex-1 items-center justify-center w-full">
+        <div id="dashboard" class="bg-gray-900 bg-opacity-70 text-white rounded-lg w-11/12 md:w-10/12 lg:w-11/12 shadow-lg flex flex-row overflow-y-auto place-content-center" style="height: calc(90vh - 90px);"> <!-- Réduit l'espace en haut et en bas (90px pour header et footer) -->
+            <div class="flex-1 p-8 text-center">
+                <h1 class="text-2xl font-bold mb-4">Mentions légales</h1>
+                <div class="border rounded-lg shadow-md bg-white text-black">
+                    <button class="w-full p-4 text-left flex justify-between items-center font-medium text-gray-700 border-b" onclick="toggleAccordion(1)">
+                        Editeur du site
+                        <span class="transform transition-transform duration-300" id="icon-1">▼</span>
+                    </button>
+                    <div class="p-4 hidden text-left" id="content-1">
+                        <strong>Ludovic CARRIL</strong>
+                        <address>
+                            <i class="fa-solid fa-map"></i> 73500 MODANE<br>
+                            <i class="fa-solid fa-location-dot"></i> Savoie<br>
+                            <i class="fa-solid fa-phone"></i> 06 06 06 06 06<br>
+                            <i class="fa-solid fa-at"></i> carril.ludovic@gmail.com
+                        </address>
+                    </div>
+                </div>
+        
+                <div class="border rounded-lg shadow-md bg-white mt-2 text-black">
+                    <button class="w-full p-4 text-left flex justify-between items-center font-medium text-gray-700 border-b" onclick="toggleAccordion(2)">
+                        Hébergeur
+                        <span class="transform transition-transform duration-300" id="icon-2">▼</span>
+                    </button>
+                    <div class="p-4 hidden text-left" id="content-2">
+                        <strong>Vercell</strong>
+                        <a href="https://vercel.com/" target="_blank">https://vercel.com/</a>
+                    </div>
+                </div>
+        
+                <div class="border rounded-lg shadow-md bg-white mt-2 text-black">
+                    <button class="w-full p-4 text-left flex justify-between items-center font-medium text-gray-700 border-b" onclick="toggleAccordion(3)">
+                        Crédits
+                        <span class="transform transition-transform duration-300" id="icon-3">▼</span>
+                    </button>
+                    <div class="p-4 hidden text-left" id="content-3">
+                        <p>Site réalisé par Ludovic CARRIL, étudiant au <a href="https://www.centre-europeen-formation.fr/" rel="noreferrer nofollow" target="_blank">Centre Européen de formation</a></p>
+                        <p>Les images utilisées sur ce site sont libres de droits et ont été obtenues sur le site <a class="fst-italic" rel="noreferrer nofollow" href="https://pixabay.com/fr/" target="_blank">Pixabay</a></p>
+                        <p>Les icônes utilisés sur ce site proviennent de la librairie <a rel="noreferrer nofollow" href="https://fontawesome.com/" target="_blank">Font Awesome</a></p>
+                    </div>
+                </div>
+
+                <div class="border rounded-lg shadow-md bg-white mt-2 text-black">
+                    <button class="w-full p-4 text-left flex justify-between items-center font-medium text-gray-700 border-b" onclick="toggleAccordion(4)">
+                        Technologies utilisées
+                        <span class="transform transition-transform duration-300" id="icon-4">▼</span>
+                    </button>
+                    <div class="p-4 hidden text-left" id="content-4">
+                        <h2 class="text-lg font-semibold">Backend et API</h2>
+                        <ul class="list-disc pl-5">
+                            <li><strong>Express.js</strong> – Framework backend pour Node.js (<a href="https://expressjs.com/" target="_blank">expressjs.com</a>)</li>
+                            <li><strong>Mongoose</strong> – ORM pour MongoDB (<a href="https://mongoosejs.com/" target="_blank">mongoosejs.com</a>)</li>
+                            <li><strong>jsonwebtoken</strong> – Authentification JWT (<a href="https://github.com/auth0/node-jsonwebtoken" target="_blank">jsonwebtoken</a>)</li>
+                            <li><strong>bcrypt</strong> – Chiffrement des mots de passe (<a href="https://www.npmjs.com/package/bcrypt" target="_blank">bcrypt</a>)</li>
+                            <li><strong>cors</strong> – Gestion des requêtes API cross-origin (<a href="https://www.npmjs.com/package/cors" target="_blank">cors</a>)</li>
+                            <li><strong>express-session</strong> – Gestion des sessions utilisateur (<a href="https://www.npmjs.com/package/express-session" target="_blank">express-session</a>)</li>
+                        </ul>
+                
+                        <h2 class="text-lg font-semibold mt-4">Documentation API</h2>
+                        <ul class="list-disc pl-5">
+                            <li><strong>Swagger-jsdoc & Swagger-UI-Express</strong> – Documentation interactive de l’API (<a href="https://swagger.io/" target="_blank">swagger.io</a>)</li>
+                            <li><strong>JSDoc</strong> – Documentation du code backend (<a href="https://jsdoc.app/" target="_blank">jsdoc.app</a>)</li>
+                        </ul>
+                
+                        <h2 class="text-lg font-semibold mt-4">Templating et frontend</h2>
+                        <ul class="list-disc pl-5">
+                            <li><strong>EJS</strong> – Moteur de templates HTML dynamique (<a href="https://ejs.co/" target="_blank">ejs.co</a>)</li>
+                            <li><strong>Tailwind CSS</strong> – Framework CSS (<a href="https://tailwindcss.com/" target="_blank">tailwindcss.com</a>)</li>
+                            <li><strong>Font Awesome</strong> – Librairie d'icônes (<a href="https://fontawesome.com/" target="_blank">fontawesome.com</a>)</li>
+                        </ul>
+                
+                        <h2 class="text-lg font-semibold mt-4">Outils et développement</h2>
+                        <ul class="list-disc pl-5">
+                            <li><strong>Nodemon</strong> – Rechargement automatique en dev (<a href="https://nodemon.io/" target="_blank">nodemon.io</a>)</li>
+                            <li><strong>env-cmd</strong> – Gestion des variables d’environnement (<a href="https://www.npmjs.com/package/env-cmd" target="_blank">env-cmd</a>)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+            </div>
+            <script>
+                function toggleAccordion(id) {
+                    const content = document.getElementById(`content-${id}`);
+                    const icon = document.getElementById(`icon-${id}`);
+                    const isOpen = !content.classList.contains("hidden");
+        
+                    document.querySelectorAll("[id^=content-]").forEach(el => el.classList.add("hidden"));
+                    document.querySelectorAll("[id^=icon-]").forEach(el => el.classList.remove("rotate-180"));
+        
+                    if (!isOpen) {
+                        content.classList.remove("hidden");
+                        icon.classList.add("rotate-180");
+                    }
+                }
+            </script>
+        </div>
+    </main>
+<%- include('components/footer'); -%>
