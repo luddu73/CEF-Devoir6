@@ -84,6 +84,26 @@ router.get('/', private.checkJWT, async function(req, res, next) {
       const totalReservations = await Reservation.countDocuments({});
     
       
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessage = null;
+    let message = null;
+
+    switch (successCode) {
+        case "DEL":
+            message = "Réservation supprimée avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "DEL_1":
+            errorMessage = "La réservation n'a pas pu être supprimée.";
+            break;
+        default:
+            errorMessage = errorCode;
+            break;
+    }
 
     res.render('dashboard', { 
       currentPage: 'dashboard', 
@@ -93,6 +113,8 @@ router.get('/', private.checkJWT, async function(req, res, next) {
       availableShortCatways,
       availabilityPercentage,
       mostReservedCatwayNumber,
+      errorMessage: errorMessage,
+      message: message,
       avgDuration,
       totalReservations,
       occupationRate

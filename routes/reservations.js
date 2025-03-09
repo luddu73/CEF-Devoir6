@@ -48,6 +48,7 @@ router.get('/', private.checkJWT, serviceReservation.getAll, function(req, res, 
     const errorCode = req.query.error;
     const successCode = req.query.success;
     let errorMessageCreate = null;
+    let errorMessage = null;
     let message = null;
     const today = new Date().toISOString().split('T')[0];
 
@@ -55,6 +56,9 @@ router.get('/', private.checkJWT, serviceReservation.getAll, function(req, res, 
     switch (successCode) {
         case "ADD":
             message = "Réservation créée avec succès.";
+            break;
+        case "DEL":
+            message = "Réservation supprimée avec succès.";
             break;
     }
 
@@ -78,6 +82,9 @@ router.get('/', private.checkJWT, serviceReservation.getAll, function(req, res, 
         case "DATE_INVALID":
             errorMessageCreate = "Les dates envoyées ne sont pas valides.";
             break;
+        case "DEL_1":
+            errorMessage = "La réservation à supprimer n'a pas été trouvée.";
+            break;
         default:
             errorMessageCreate = errorCode;
             break;
@@ -86,6 +93,7 @@ router.get('/', private.checkJWT, serviceReservation.getAll, function(req, res, 
     res.render('reservations', { 
         currentPage: 'reservations',
         errorMessageCreate: errorMessageCreate,
+        errorMessage: errorMessage,
         message: message,
         today: today,
         formData: req.session.formData  // Passe formData dans la vue

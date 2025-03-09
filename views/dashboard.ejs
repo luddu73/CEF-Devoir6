@@ -15,6 +15,24 @@
                     <section class="col-span-2 m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg overflow-x-auto">
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Réservations en cours</h2>
                         <p class="m-3 text-blue-800">Il y a <strong><%= currentReservations.length %></strong> réservation en cours.</p>
+                        <div class="flex items-center p-4 mb-4 text-sm text-green-700 bg-green-100 border-l-4 border-green-500 rounded-lg <% if (typeof message !== 'undefined' && message) { %> block <% } else { %>hidden<% } %> " role="alert">
+                            <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"></path>
+                            </svg>
+                            <% if (typeof message !== 'undefined' && message) { %>
+                                <%= message %>
+                                <% message = null; %>
+                            <% } %>
+                        </div>
+                        <div class="flex items-center p-4 mb-4 text-sm text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg <% if (typeof errorMessage !== 'undefined' && errorMessage) { %> block <% } else { %>hidden<% } %>" role="alert">
+                          <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"></path>
+                          </svg>
+                            <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                                <%= errorMessage %>
+                                <% errorMessage = null; %>
+                            <% } %>
+                        </div>
                         <table class="min-w-full divide-y divide-gray-300">
                             <thead class="bg-gray-50">
                                 <tr>
@@ -37,7 +55,8 @@
                                             <button type="button" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
-                                            <button type="button" class="relative -ml-px inline-flex items-center rounded-r-md bg-red-500 px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-red-400 focus:z-10">
+                                            <button type="button" onclick="openModalDelete('<%= reservation._id %>', '<%= reservation.clientName %>', '<%= reservation.startDate.toLocaleDateString().slice(0, 10) %>', '<%= reservation.endDate.toLocaleDateString().slice(0, 10) %>')"
+                                                    class="relative -ml-px inline-flex items-center rounded-r-md bg-red-500 px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-red-400 focus:z-10">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </span>
@@ -52,6 +71,69 @@
                             </tbody>
                         </table>
                     </section>
+                    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+                        <div id="modalBackdrop" onclick="closeModalDelete()" class="absolute inset-0 z-10"></div>
+                        <div id="modalContent" class="relative bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center z-20">
+                          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex flex-col items-center justify-center">
+                            <div class="top-2 left-2 flex flex-col items-center justify-center w-8 h-8 bg-red-100 rounded-full">
+                              <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                              </svg>
+                            </div>
+                            <h3 class="text-base font-semibold text-gray-900" id="modal-title"></h3>
+                          </div>
+                          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex flex-col">
+                            <div class="mt-2">
+                              <p id="modal-message" class="text-sm text-gray-500"></p>
+                            </div>
+                          </div>
+                          <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <button id="modal-link" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Confirmer</button>
+                            <button onclick="closeModalDelete()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Annuler</button>
+                          </div>
+                        </div>
+                    </div>
+                    <script>
+                        function openModalDelete(idReservation, clientName, startDate, endDate) {
+                            const title = document.getElementById("modal-title");
+                            const message = document.getElementById("modal-message");
+                            const link = document.getElementById("modal-link");
+
+                            // Mettez à jour le contenu du titre et du message en fonction de l'utilisateur
+                            title.innerText = `Supprimer la réservation de ${clientName}`;
+                            message.innerText = `Êtes-vous sûr de vouloir supprimer la réservation de ${clientName} du ${startDate} au ${endDate} ? Cette action est irréversible.`;
+                            link.onclick = function() {
+                                deleteReservation(idReservation);
+                            };
+                            // Affiche la modale
+                            document.getElementById("deleteModal").classList.remove("hidden");
+                        }
+                        function deleteReservation(idReservation) {
+                            // Effectuer la requête pour supprimer l'utilisateur
+                            fetch(`/reservations/${idReservation}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.href = `/dashboard?success=DEL`;
+                                } else {
+                                    window.location.href = `/dashboard?error=${data.errorInfo}`;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Erreur:', error);
+                                window.location.href = `/error?errorCode=500&title=Erreur+Interne&message=Une+erreur+inattendue+est+survenue`;
+                            });
+                        }
+                        
+                        function closeModalDelete() {
+                        document.getElementById("deleteModal").classList.add("hidden");
+                        }
+                    </script>
                     <div class="m-2 p-4 bg-blue-100 bg-opacity-70 rounded-lg border border-blue-400 shadow-lg">
                         <h2 class="text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-sailboat"></i> Catways</h2>
                         <p class="m-3 text-blue-800">Il y a <strong><%= availableCatwaysCount %></strong> catways disponibles (dont <%= availableLongCatways %> long et <%= availableShortCatways %> short).</p>
