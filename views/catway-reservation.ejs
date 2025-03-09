@@ -41,7 +41,7 @@
                             <% if (new Date(reservations.startDate) > new Date()) { %>
                                 <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">Future</span>
                             <% } %>
-                        </h2>
+                        </h3>
                         <p class="m-3 text-blue-800"> Date de début : <%= reservations.startDate.toLocaleDateString().slice(0, 10) %></p>
                         <p class="m-3 text-blue-800"> Date de fin : <%= reservations.endDate.toLocaleDateString().slice(0, 10) %></p>
                         <button onclick="openModal()" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="relative flex" id="startDateInput">
                                     <input id="startDate" onchange="checkAvailableCatways()" name="startDate" type="date" min="<% if(new Date(reservations.startDate).toISOString().split('T')[0] < today) { %><%= new Date(reservations.startDate).toISOString().split('T')[0] %><% } else { %><%= today %><% } %>" 
-                                            placeholder="Date de début (AAAA-MM-JJ)" class="w-full px-3 py-2 border rounded <% if(new Date(reservations.startDate).toISOString().split('T')[0] < today) { %>bg-gray-100<% } %>"
+                                            class="w-full px-3 py-2 border rounded <% if(new Date(reservations.startDate).toISOString().split('T')[0] < today) { %>bg-gray-100<% } %>"
                                             value="<%= new Date(reservations.startDate).toISOString().split('T')[0] %>"
                                             <% if(new Date(reservations.startDate).toISOString().split('T')[0] < today) { %> readonly <% } %> 
                                             >
@@ -81,7 +81,7 @@
                                 </div>
                                 <div class="relative flex" id="endDateInput">
                                     <input id="endDate" onchange="checkAvailableCatways()" name="endDate" type="date" min="<% if(new Date(reservations.startDate).toISOString().split('T')[0] > today) { %><%= new Date(reservations.startDate).toISOString().split('T')[0] %><% } else { %><%= today %><% } %>" 
-                                            placeholder="Date de fin (AAAA-MM-JJ)" class="w-full px-3 py-2 border rounded" value="<%= new Date(reservations.endDate).toISOString().split('T')[0]; %>" >
+                                            class="w-full px-3 py-2 border rounded" value="<%= new Date(reservations.endDate).toISOString().split('T')[0]; %>" >
                                     <i id="endDateErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                                 </div>
                                 <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" type="submit">Enregistrer</button>
@@ -121,4 +121,3 @@
         </div>
     </main>
     <%- include('components/footer'); -%>
-</body>
