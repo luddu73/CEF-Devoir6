@@ -445,7 +445,9 @@ router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservat
     }
 
     res.render('catway-reservation', { 
-        currentPage: 'catways',
+        precedatePage: `/catways/${req.params.id}`,
+        infoCatwayNumber: `${req.params.id}`,
+        currentPage: 'catwaysview',
         errorMessageCreate: errorMessageCreate,
         errorMessage: errorMessage,
         message: message,
