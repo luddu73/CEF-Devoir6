@@ -25,14 +25,37 @@ exports.checkCatwayExists = async (req, res, next) => {
         const catway = await Catway.findOne({ catwayNumber: id });
 
         if (!catway) {
-            return res.status(404).json('Catway non trouvé');
+            return res.redirect('/reservations?error=ADD_5')
         }
 
         req.catway = catway;
         next();
     }
     catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/catways?error=ADD_3`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 /**
@@ -208,6 +231,7 @@ exports.getById = async (req, res, next) => {
  * @async
  * @function checkReservation
  * @param {number} catwayNumber - Numéro du catway choisi
+ * @param {string} catwayType - Le type de catway attendu
  * @param {Date} startDate - Date de début de la réservation souhaitée.
  * @param {Date} endDate - Date de fin de la réservation souhaitée.
  * @returns {Response} Retourne une réponse JSON qui indique la présence ou non d'une réservation sur la période choisie ou une erreur
@@ -225,7 +249,7 @@ const checkReservation = async (catwayNumber, startDate, endDate) => {
 
         return presentReservation;
     } catch (error) {
-        return res.status(501).json(error);
+        throw error;
     }
 }
 
@@ -245,34 +269,69 @@ exports.add = async (req, res, next) => {
         clientName: req.body.clientName,
         boatName: req.body.boatName,
         startDate: req.body.startDate,
-        endDate: req.body.endDate
+        endDate: req.body.endDate,
+        catwayType: req.body.catwayType
     });
+    console.log('Date envoyée par le body : ', temp.startDate, temp.endDate);
 
     let DateDebut = new Date(temp.startDate);
     let DateFin = new Date(temp.endDate);
     let DateAct = new Date();
-    
-    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
+    console.log("Date transformée : ", DateDebut, DateFin);
+
+    if (isNaN(DateDebut) || isNaN(DateFin)) {
+        console.error("Erreur : Date invalide détectée !");
+        return res.redirect('/reservations?error=DATE_INVALID');
+    }
+    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate || !temp.catwayType)
     {
-        return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+        req.session.formData = req.body;
+        return res.redirect('/reservations?error=ADD_1');
+        //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
     }
     if (DateDebut <= DateAct) {
-        return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+        req.session.formData = req.body;
+        return res.redirect('/reservations?error=ADD_2');
+        //return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
     }
     if (DateDebut > DateFin) {
-        return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+        req.session.formData = req.body;
+        return res.redirect('/reservations?error=ADD_3');
+        //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
     try {
-        const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
+        const presentReservation = await checkReservation(temp.catwayNumber, DateDebut, DateFin);
         if (presentReservation) {
-            return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+            req.session.formData = req.body;
+            return res.redirect('/reservations?error=ADD_4');
+            //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
         }
         let reservation = await Reservation.create(temp);
-
-        return res.status(201).json(reservation);
+        req.session.formData = null;
+        return res.redirect('/reservations?success=ADD');
+        //return res.status(201).json(reservation);
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
@@ -303,9 +362,9 @@ exports.update = async (req, res, next) => {
         return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
     }
 
-    let DateDebut = new Date(temp.startDate);
-    let DateFin = new Date(temp.endDate);
-    let DateAct = new Date();
+    let DateDebut = new Date(temp.startDate).toISOString();
+    let DateFin = new Date(temp.endDate).toISOString();
+    let DateAct = new Date().toISOString();
     
     if (DateDebut <= DateAct) {
         return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});

@@ -19,6 +19,7 @@ var usersRouter = require('./routes/users');
 var catwaysRouter = require('./routes/catways');
 var reservationsRouter = require('./routes/reservations');
 var dashboardRouter = require('./routes/dashboard');
+var availableRouter = require('./routes/available');
 
 mongodb.initClientDbConnection();
 
@@ -102,6 +103,7 @@ app.use('/dashboard', dashboardRouter);
 app.use('/users', usersRouter);
 app.use('/catways', catwaysRouter);
 app.use('/reservations', reservationsRouter);
+app.use('/available', availableRouter);
 
 // Servir la doc Swagger sur /api-docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOptions));
