@@ -1,6 +1,6 @@
 {
   "name": "api-port-de-plaisance-russell",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "env-cmd -f ./env/.env node ./bin/www",

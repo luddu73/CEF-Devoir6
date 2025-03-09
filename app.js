@@ -64,7 +64,7 @@ if (process.env.NODE_ENV !== "production") {
 } else {
   console.log("🌐 CORS configuré en mode production");
   const corsOptions = {
-    origin: "http://localhost", // Permet uniquement ce frontend en production
+    origin: "https://cef-devoir6.vercel.app/", // Permet uniquement ce frontend en production
     methods: ["GET", "POST", "PUT", "DELETE"], // Liste des méthodes autorisées
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Autorise l'envoi de cookies/token en production
