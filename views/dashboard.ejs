@@ -52,10 +52,8 @@
                                     <td class="hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500"><%= reservation.endDate.toLocaleDateString().slice(0, 10) %></td>
                                     <td class="px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-white">
                                         <span class="isolate inline-flex rounded-md shadow-xs">
-                                            <a href="/reservations/<%= reservation._id %>">
-                                                <button type="button" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
+                                            <a href="/reservations/<%= reservation._id %>" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
                                                 <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
                                             </a>
                                             <button type="button" onclick="openModalDelete('<%= reservation._id %>', '<%= reservation.clientName %>', '<%= reservation.startDate.toLocaleDateString().slice(0, 10) %>', '<%= reservation.endDate.toLocaleDateString().slice(0, 10) %>')"
                                                     class="relative -ml-px inline-flex items-center rounded-r-md bg-red-500 px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-red-400 focus:z-10">
@@ -82,7 +80,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                               </svg>
                             </div>
-                            <h3 class="text-base font-semibold text-gray-900" id="modal-title"></h3>
+                            <h3 class="text-base font-semibold text-gray-900" id="modal-title">Supprimer la réservation</h3>
                           </div>
                           <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex flex-col">
                             <div class="mt-2">
@@ -201,4 +199,3 @@
         </div>
     </main>
     <%- include('components/footer'); -%>
-</body>

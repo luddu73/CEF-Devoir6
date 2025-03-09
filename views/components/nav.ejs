@@ -1,11 +1,10 @@
 <div id="sidebar" class="bg-blue-800 text-white w-64 space-y-6 p-6 transform transition-transform duration-300 ease-in-out rounded-tl-lg rounded-bl-lg md:block hidden" style="flex-shrink: 0; height: 100%;">
     <div class="space-y-4">
-        <section name="topMenu" class="text-center">
+        <section id="topMenu" class="text-center">
             <button onclick="toggleSidebar()" id="closeSidebarButton" class="md:hidden text-white top-4 left-4 z-10">
                 <i class="fa-solid fa-xmark"></i> Fermer le menu
-                <hr>
             </button>
-            <h2 class="text-xl font-bold mb-4">Bienvenue <%= user.username %> !</h2>
+            <h2 class="text-xl font-bold mt-2 mb-4">Bienvenue <%= user.username %> !</h2>
             <p>Nous sommes le <br>
                 <span>
                     <script>
@@ -16,14 +15,14 @@
             </p>
         </section>
         <ul>
-            <li><a href="/dashboard" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'dashboard' ? 'bg-gray-800 text-white' : '' %>" <%= currentPage == 'dashboard' ? 'aria-current="page"' : '' %>><i class="fa-solid fa-gauge"></i> Accueil</a></li>
-            <li><a href="/users" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'users' ? 'bg-gray-800 text-white' : '' %>" <%= currentPage == 'users' ? 'aria-current="page"' : '' %>><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
+            <li><a href="/dashboard" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'dashboard' ? 'bg-gray-800 text-white' : '' %>" <%= currentPage == 'dashboard' ? 'aria-current' : '' %>><i class="fa-solid fa-gauge"></i> Accueil</a></li>
+            <li><a href="/users" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'users' ? 'bg-gray-800 text-white' : '' %>" <%= currentPage == 'users' ? 'aria-current' : '' %>><i class="fa-solid fa-user"></i> Utilisateurs</a></li>
             <li><a href="/catways" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'catways' ? 'bg-gray-800 text-white' : '' %> <% if (typeof precedatePage !== 'undefined' && precedatePage) { %>bg-gray-600 text-white <% } %>" 
-                <%= currentPage == 'catways' ? 'aria-current="page"' : '' %>>
+                <%= currentPage == 'catways' ? 'aria-current' : '' %>>
                 <i class="fa-solid fa-sailboat"></i> Catways</a>
             </li>
             <% if (typeof precedatePage !== 'undefined' && precedatePage) { %> <li><a href="<%= precedatePage %>" class="block py-2 px-4 hover:bg-gray-700 bg-gray-800 text-white"><i class="fa-solid fa-backward"></i> Catway N°<%= infoCatwayNumber %></a></li> <% } %>
-            <li><a href="/reservations" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'reservations' ? 'bg-gray-800 text-white' : '' %>" <%= currentPage == 'reservations' ? 'aria-current="page"' : '' %>"><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
+            <li><a href="/reservations" class="block py-2 px-4 hover:bg-gray-700 <%= currentPage == 'reservations' ? 'bg-gray-800 text-white' : '' %>" <%= currentPage == 'reservations' ? 'aria-current' : '' %>><i class="fa-solid fa-calendar-days"></i> Réservations</a></li>
         </ul>
         <hr>
         <ul>

@@ -21,8 +21,6 @@
             </button>
         </div>
     </div>
-    <%- include('components/footer'); -%>
-
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if ((typeof errorMessage !== 'undefined' && errorMessage) || (typeof message !== 'undefined' && message)) { %>block<% } else { %>hidden<% } %>">
         <div id="modalBackdrop" onclick="closeModal()" class="absolute inset-0 z-10"></div>
         <div id="modalContent" class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center z-20">
@@ -52,28 +50,27 @@
           <button onclick="closeModal()" class="text-red-500 mt-4 block w-full">Annuler</button>
         </div>
     </div>
-      
-      <script>
+    <script>
         <% if (typeof user !== 'undefined' && user && typeof message == 'undefined') { %>
             // Redirection vers le dashboard si l'utilisateur est connecté
             setTimeout(function() {
                 window.location.href = '/dashboard'; // Redirige vers le dashboard
             }, 0);
         <% } %>
-
+    
         <% if (typeof message !== 'undefined' && message) { %>
             // Redirection vers le dashboard après 3 secondes
             setTimeout(function() {
                 window.location.href = '/dashboard'; // Redirige vers le dashboard
             }, 3000);
         <% } %>
-
-        function openModal() {
+    
+    function openModal() {
           document.getElementById("loginModal").classList.remove("hidden");
         }
         
-        function closeModal() {
+    function closeModal() {
           document.getElementById("loginModal").classList.add("hidden");
         }
-      </script>
-</body>
+    </script>
+<%- include('components/footer'); -%>
