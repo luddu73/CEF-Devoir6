@@ -1,3 +1,14 @@
+/**
+ * @module dashboard
+ * @description Gère la page d'accueil du tableau de bord, affichant les informations des catways et des réservations en cours.
+ */
+/**
+ * @swagger
+ * tags:
+ *   name: Dashboard
+ *   description: Gestion du tableau de bord avec des informations sur les réservations et les catways.
+ */
+
 var express = require('express');
 var router = express.Router();
 
@@ -6,7 +17,39 @@ const private = require('../middlewares/private');
 const Catway = require('../models/catways');
 const Reservation = require('../models/reservations');
 
-/* GET home page. */
+/**
+ * @function
+ * @name GET /
+ * @description Affiche la page d'accueil du tableau de bord avec les informations sur les réservations et les catways disponibles.
+ * @middleware private.checkJWT - Vérifie le JWT pour l'accès privé
+ * @async
+ * @param {Object} req - La requête HTTP
+ * @param {Object} res - La réponse HTTP
+ * @param {Function} next - Fonction pour passer au middleware suivant
+ * @returns {void} - Rend la vue 'dashboard' avec les informations demandées
+ * @throws {Error} - Si une erreur se produit lors de la récupération des données
+ */
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     tags:
+ *       - "Dashboard"
+ *     summary: "Affiche le tableau de bord"
+ *     description: "Cette route permet d'afficher la page d'accueil du tableau de bord avec des informations sur les catways, réservations en cours et taux de disponibilité."
+ *     responses:
+ *       200:
+ *         description: "Page d'accueil du tableau de bord affichée avec succès."
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: "<html>...</html>"
+ *       401:
+ *         description: "Accès non autorisé, JWT manquant ou invalide"
+ *       500:
+ *         description: "Erreur interne du serveur"
+ */
 router.get('/', private.checkJWT, async function(req, res, next) {  
   try {
     const currentDate = new Date();
@@ -95,7 +138,6 @@ router.get('/', private.checkJWT, async function(req, res, next) {
             break;
     }
 
-    // Définir le message d'erreur basé sur le code
     switch (errorCode) {
         case "DEL_1":
             errorMessage = "La réservation n'a pas pu être supprimée.";

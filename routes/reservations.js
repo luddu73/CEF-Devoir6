@@ -249,7 +249,7 @@ router.get('/:idReservation', private.checkJWT, serviceReservation.checkReservat
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
  *       404:
- *          description: "Réservation non trouvée"
+ *          description: "Catway non trouvé"
  *       501:
  *         description: "Erreur serveur."
  */

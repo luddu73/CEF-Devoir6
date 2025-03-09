@@ -10,8 +10,8 @@ const bcrypt = require('bcrypt');
 /**
  * Vérifie la présentation du nom d'utilisateur (lettre Majuscule et minuscule uniquement)
  * @async
- * @function checkEmail
- * @param {string} username - L'input à vérifier
+ * @function checkUsername
+ * @param {string} username - Le nom d'utilisateur à vérifier
  * @returns {boolean} Retourne une réponse "true" si le nom d'utilisateur est conforme, sinon "false"
  */
 const checkUsername = (username) => {
@@ -55,13 +55,15 @@ const checkPasswordLength = (password) => {
 };
 
 /**
- * Permet de créer un nouvel utilisateur
+ * Permet de créer un nouvel utilisateur après avoir vérifié les données entrées.
+ * Si une erreur se produit, redirige l'utilisateur avec un message d'erreur. 
+ * En cas de succès, redirige vers la liste des utilisateurs.
  * @async
  * @function add
  * @param {object} req - Objet de la requête avec les données de l'utilisateur à créer.
  * @param {object} res - L'objet de réponse Express.
- * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec l'utilisateur crée ou une erreur
+ * @param {function} next - La fonction middleware suivante pour la suite de l'exécution.
+ * @returns {Response} Redirige l'utilisateur selon le résultat
  */
 exports.add = async (req, res, next) => {
     const temp = ({
@@ -73,40 +75,32 @@ exports.add = async (req, res, next) => {
 
     if (!temp.username)
     {
-        //return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
         req.session.formData = req.body;
-        return res.redirect('/users?error=ADD_1');
+        return res.redirect('/users?error=ADD_1'); // Le nom d'utilisateur doit être renseigné
     }
     if (!checkUsername(temp.username)) {
-        //return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
         req.session.formData = { username: req.body.username, email: req.body.email };
-        return res.redirect('/users?error=ADD_2');
+        return res.redirect('/users?error=ADD_2'); // Le nom d'utilisateur ne peut contenir que des lettres.
     }
     if (!checkEmail(temp.email)) {
-        //return res.status(400).json({ error: "Adresse email invalide."});
         req.session.formData = req.body;
-        return res.redirect('/users?error=ADD_3');
+        return res.redirect('/users?error=ADD_3'); // Adresse email invalide
     }
     if (!checkPassword(temp.password)) {
-        //return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
         req.session.formData = req.body;
-        return res.redirect('/users?error=ADD_4');
+        return res.redirect('/users?error=ADD_4'); // Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.
     }
     if (!checkPasswordLength(temp.password)) {
-        //return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
         req.session.formData = req.body;
-        return res.redirect('/users?error=ADD_4');
+        return res.redirect('/users?error=ADD_4'); // Le mot de passe doit avoir au moins 8 caractères
     }
     if (temp.password != temp.confirmPassword) {
-        //return res.status(400).json({ error: "Les mots de passe ne correspondent pas."});
         req.session.formData = req.body;
-        return res.redirect('/users?error=ADD_5');
+        return res.redirect('/users?error=ADD_5'); // Les mots de passe ne correspondent pas
     }
 
     try {
         let user = await User.create(temp);
-
-        //return res.status(201).json(user);
         req.session.formData = null;
         return res.redirect('/users?success=ADD');
     } catch (error) {
@@ -125,7 +119,6 @@ exports.add = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -144,19 +137,16 @@ exports.add = async (req, res, next) => {
  * @param {object} req - Objet de la requête Express.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec la liste des utilisateurs ou une erreur
+ * @returns {Response} - Retourne la liste des utilisateurs ou un message d'erreur si aucun utilisateur n'est trouvé.
  */
 exports.getAll = async (req, res, next) => {
     try {
         let users = await User.find();
 
         if (users.length > 0) {
-            //return res.status(200).json(users);
             res.locals.users = users;
             return next();
         }
-
-        //return res.status(404).json('Aucun utilisateur trouvé');
         console.log("Aucun utilisateur trouvé");
         res.locals.users = users;
         res.errorMessage = "Aucun utilisateur trouvé";
@@ -186,12 +176,13 @@ exports.getAll = async (req, res, next) => {
 }
 /**
  * Permet de récupérer les données d'un utilisateur grâce à son adresse email.
+ * Si l'utilisateur est trouvé, renvoie ses données. Sinon, redirige vers une page d'erreur.
  * @async
  * @function getByEmail
  * @param {object} req - Objet de la requête Express contenant l'email dans les paramètres.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec les données de l'utilisateur ou une erreur
+ * @returns {Response} - Retourne les données de l'utilisateur ou redirige vers une erreur.
  */
 exports.getByEmail = async (req, res, next) => {
     const email = req.params.email
@@ -200,7 +191,6 @@ exports.getByEmail = async (req, res, next) => {
         let user = await User.findOne({ email });
 
         if (user) {
-            //return res.status(200).json(user);
             res.locals.user = user;
             return next();
         }
@@ -217,7 +207,6 @@ exports.getByEmail = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -230,12 +219,13 @@ exports.getByEmail = async (req, res, next) => {
 }
 /**
  * Met à jour les données d'un utilisateur en l'identifiant par son adresse email.
+ * Si une erreur se produit lors de la mise à jour, redirige avec un message d'erreur spécifique.
  * @async
  * @function update
  * @param {object} req - Objet de la requête Express contenant les nouveaux paramètres à appliquer à l'utilisateur.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec les données de l'utilisateur mise à jour ou une erreur
+ * @returns {Response} - Retourne un message de succès ou redirige vers une erreur si la mise à jour échoue.
  */
 exports.update = async (req, res, next) => {
     const email = req.params.email
@@ -248,28 +238,22 @@ exports.update = async (req, res, next) => {
 
     if (!temp.username)
     {
-        return res.redirect(`/users/${email}?error=UPD_1`);
-       // return res.status(400).json({ error: "Le nom d'utilisateur doit être renseigné"});
+        return res.redirect(`/users/${email}?error=UPD_1`); // Le nom d'utilisateur doit être renseigné
     }
     if (!checkUsername(temp.username)) {
-        return res.redirect(`/users/${email}?error=UPD_2`);
-        //return res.status(400).json({ error: "Le nom d'utilisateur ne peut contenir que des lettres."});
+        return res.redirect(`/users/${email}?error=UPD_2`); // Le nom d'utilisateur ne peut contenir que des lettres.
     }
     if (!checkEmail(temp.email)) {
-        return res.redirect(`/users/${email}?error=UPD_3`);
-        //return res.status(400).json({ error: "Adresse email invalide."});
+        return res.redirect(`/users/${email}?error=UPD_3`); // Adresse email invalide.
     }
     if (temp.password && !checkPassword(temp.password)) {
-        return res.redirect(`/users/${email}?error=UPD_4`);
-        //return res.status(400).json({ error: "Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial."});
+        return res.redirect(`/users/${email}?error=UPD_4`); // Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.
     }
     if (temp.password && !checkPasswordLength(temp.password)) {
-        return res.redirect(`/users/${email}?error=UPD_4`);
-        //return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+        return res.redirect(`/users/${email}?error=UPD_4`); // Le mot de passe doit avoir au moins 8 caractères.
     }
     if (temp.password != temp.confirmPassword) {
-        return res.redirect(`/users/${email}?error=UPD_5`);
-        //return res.status(400).json({ error: "Le mot de passe doit avoir au moins 8 caractères."});
+        return res.redirect(`/users/${email}?error=UPD_5`); // Le mot de passe doit avoir au moins 8 caractères.
     }
 
     try {
@@ -288,16 +272,14 @@ exports.update = async (req, res, next) => {
             }
 
             await user.save({ validateModifiedOnly: true });
-            //return res.status(201).json(user);
             return res.redirect(`/users/${temp.email}?success=UPD`);
         }
-        return res.redirect('/users?error=USR_1');
-        //return res.status(404).json('Utilisateur non trouvé');
+        return res.redirect('/users?error=USR_1'); // Utilisateur non trouvé
     } catch (error) {
         // Code erreur de MongoDB de duplication
         if (error.code === 11000) {
             req.session.formData = req.body;
-            return res.redirect(`/users/${email}?error=UPD_6`);
+            return res.redirect(`/users/${email}?error=UPD_6`); // Doublon d'email dans la base de donnée
         }
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
             console.error(error);
@@ -309,7 +291,6 @@ exports.update = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -323,12 +304,13 @@ exports.update = async (req, res, next) => {
 
 /**
  * Supprime un utilisateur en l'identifiant par son adresse email.
+ * Si l'utilisateur essaie de supprimer son propre compte, une erreur est renvoyée.
  * @async
  * @function delete
  * @param {object} req - Objet de la requête Express contenant l'email à supprimer dans les paramètres.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON ou une erreur
+ * @returns {Response} - Retourne un message de succès ou d'erreur selon si l'utilisateur a été supprimé.
  */
 exports.delete = async (req, res, next) => {
     const email = req.params.email
@@ -360,7 +342,6 @@ exports.delete = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;

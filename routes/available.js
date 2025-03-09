@@ -19,42 +19,46 @@ const private = require('../middlewares/private');
  *     summary: "Recherche les catways disponibles"
  *     description: "Selon le type de catway et les dates choisies, ont exporte la liste des catways afin de mettre à jour le formulaire de réservation."
  *     parameters:
- *       - name: "idReservation"
- *         in: "path"
+ *       - name: "catwayType"
+ *         in: "query"
  *         required: true
- *         description: "ID de la réservation recherchée."
+ *         description: "Le type de catway recherché (long ou court)."
  *         schema:
  *           type: string
+ *           enum: [long, short]
+ *       - name: "startDate"
+ *         in: "query"
+ *         required: true
+ *         description: "Date de début de la réservation."
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - name: "endDate"
+ *         in: "query"
+ *         required: true
+ *         description: "Date de fin de la réservation."
+ *         schema:
+ *           type: string
+ *           format: date
  *     responses:
  *       200:
- *         description: "Réservation récupérée avec succès."
+ *         description: "Liste des catways disponibles récupérée avec succès."
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   catwayNumber:
- *                     type: number
- *                   clientName:
- *                     type: string
- *                   boatName:
- *                     type: string
- *                   startDate:
- *                     type: string
- *                     format: date
- *                   endDate:
- *                     type: string
- *                     format: date
+ *                 type: number
+ *                 description: "Numéro du catway disponible"
+ *               example: [12, 15, 20]
  *       400:
- *          description: "L'ID de réservation ressort un format non valide"
+ *         description: "Paramètres manquants ou invalides (catwayType, startDate, endDate)."
  *       401:
- *          description: "Token de sécurité invalide ou inexistant"
+ *         description: "Token de sécurité invalide ou inexistant."
  *       404:
- *          description: "Réservation non trouvée"
- *       501:
- *         description: "Erreur serveur."
+ *         description: "Aucun catway disponible trouvé."
+ *       500:
+ *         description: "Erreur serveur interne lors de la récupération des catways."
  */
 router.get('/', async (req, res) => {
     console.log("Requête reçue avec paramètres :", req.query);
@@ -86,7 +90,6 @@ router.get('/', async (req, res) => {
      };
   
       const availableCatways = await getAvailableCatways(catwayType, new Date(startDate), new Date(endDate));
-      console.log(availableCatways);
       res.json(availableCatways);
     } catch (error) {
       console.error('Erreur lors de la récupération des catways disponibles :', error);

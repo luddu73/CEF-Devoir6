@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
  *  schemas:
  *      User:
  *          type: object
+ *          description: "Représente un utilisateur de l'API avec son email et un mot de passe crypté."
  *          required:
  *              - username
  *              - email
@@ -25,7 +26,7 @@ const bcrypt = require('bcrypt');
  *          example:
  *              username: "JohnDoe"
  *              email: "john.doe@example.com"
- *              password: "$2b$10$abc123hashedpassw0rd"
+ *              password: "My$ecureP@ssw0rd" # Exemple de mot de passe en texte brut, avant hachage
  */
 
 const User = new Schema({
@@ -50,9 +51,14 @@ const User = new Schema({
         match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/, 'Le mot de passe doit contenir au moins : 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.']
     }
 });
+
+
 /**
  * Middleware exécuté avant la sauvegarde d'un utilisateur.
  * Si le mot de passe a été modifié, il est haché avant d'être enregistré.
+ * Utilise bcrypt pour hasher le mot de passe de manière synchrone avec un salage de 10.
+ * 
+ * @param {function} next - La fonction de callback pour passer à la sauvegarde après l'hachage.
  */
 User.pre('save', function(next) {
     if (!this.isModified('password')) {

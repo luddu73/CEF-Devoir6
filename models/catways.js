@@ -7,6 +7,7 @@ const Schema = mongoose.Schema;
  *  schemas:
  *      Catway:
  *          type: object
+ *          description: "Représente un catway dans le port de plaisance, incluant son numéro, type et état."
  *          required:
  *              - catwayNumber
  *              - catwayType
@@ -23,7 +24,7 @@ const Schema = mongoose.Schema;
  *                  type: string
  *                  description: Champ libre permettant de faire un commentaire sur l'état du catway
  *          example:
- *              catwayNumber: "12"
+ *              catwayNumber: 12
  *              catwayType: "long"
  *              catwayState: "Quelques fissures sur le quai"
  */

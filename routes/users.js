@@ -229,6 +229,8 @@ router.get('/:email', private.checkJWT, service.getByEmail, function(req, res, n
  *          description: "Token de sécurité invalide ou inexistant"
  *       400:
  *         description: "Mauvaise requête (email ou mot de passe invalide)."
+ *       409:
+ *         description: "Conflit. Cette adresse email existe déjà dans le système."
  *       501:
  *         description: "Erreur serveur."
  */
@@ -276,6 +278,8 @@ router.post('/', private.checkJWT, service.add);
  *         description: "Mauvaise requête (email ou mot de passe invalide)."
  *       404:
  *         description: "Utilisateur non trouvé."
+ *       409:
+ *         description: "Conflit. Cette adresse email existe déjà dans le système."
  *       501:
  *         description: "Erreur serveur."
  */
@@ -303,6 +307,8 @@ router.put('/:email', private.checkJWT, service.update);
  *          description: "Token de sécurité invalide ou inexistant"
  *       404:
  *          description: "Utilisateur non trouvé"
+ *       409:
+ *          description: "Vous ne pouvez pas supprimer votre propre compte."
  *       501:
  *         description: "Erreur serveur."
  */
