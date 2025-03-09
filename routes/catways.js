@@ -17,6 +17,7 @@ var router = express.Router();
 
 const service = require('../services/catways');
 const serviceReservation = require('../services/reservations');
+const Reservation = require('../models/reservations');
 
 // Import du middleware pour privatisation
 const private = require('../middlewares/private');
@@ -84,6 +85,9 @@ router.get('/', private.checkJWT, service.getAll, function(req, res, next) {
             break;
         case "DEL_1":
             errorMessage = "Catway introuvable.";
+            break;
+        case "DEL_2":
+            errorMessage = "Impossible de supprimer ce catway, il y a des réservations enregistrées.";
             break;
         case "UPD_1":
             errorMessage = "Catway introuvable.";
@@ -236,7 +240,7 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
  *       400:
- *         description: "Le type doit être court ou long."
+ *         description: "Erreur dans les données envoyées."
  *       501:
  *         description: "Erreur serveur."
  */
@@ -270,6 +274,8 @@ router.post('/', private.checkJWT, service.add);
  *     responses:
  *       201:
  *         description: "Catway modifié avec succès."
+ *       400:
+ *         description: "Erreur dans les données envoyées."
  *       401:
  *          description: "Token de sécurité invalide ou inexistant"
  *       404:
@@ -302,7 +308,31 @@ router.put('/:id', private.checkJWT, service.update);
  *       501:
  *         description: "Erreur serveur."
  */
-router.delete('/:id', private.checkJWT, service.delete);
+router.delete('/:id', private.checkJWT, async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        // Vérifie si des réservations existent pour ce catway
+        const reservations = await Reservation.find({ catwayNumber: id });
+
+        if (reservations.length > 0) {
+            res.locals.canDelete = false;
+            console.log(res.locals.canDelete);
+        } else { 
+            res.locals.canDelete = true;
+        }        
+        
+        service.delete(req, res, next);  // Appeler la fonction de suppression ici
+
+    } catch (error) {
+        console.error(error);
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        });
+    }
+});
 
 
 /**

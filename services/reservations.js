@@ -47,7 +47,6 @@ exports.checkCatwayExists = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -82,8 +81,7 @@ exports.checkReservationCatwayExists = async (req, res, next) => {
 
         if (!reservation) {
             req.session.formData = req.body;
-            return res.redirect(`/catways/${id}?error=RSV_1`);
-            //return res.status(404).json('Réservation non trouvée sur ce catway');
+            return res.redirect(`/catways/${id}?error=RSV_1`); // Réservation non trouvée sur ce catway
         }
 
         req.reservation = reservation;
@@ -105,7 +103,6 @@ exports.checkReservationCatwayExists = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -186,7 +183,6 @@ exports.getAll = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -234,7 +230,6 @@ exports.getByCatway = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -277,7 +272,6 @@ exports.getById = async (req, res, next) => {
             
             res.locals.reservations = reservations;
             return next();
-            //return res.status(200).json(reservations);
         }
 
         return res.redirect('/reservations?error=RSV_1');
@@ -293,7 +287,6 @@ exports.getById = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -340,7 +333,7 @@ const checkReservation = async (catwayNumber, startDate, endDate, currentReserva
  * @param {object} req - Objet de la requête avec les données de la réservation à créer.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec la réservation créee ou une erreur
+ * @returns {Response} - Renvoie une réponse de suppression ou une erreur.
  */
 exports.add = async (req, res, next) => {
     
@@ -365,7 +358,7 @@ exports.add = async (req, res, next) => {
 
     if (req.errorCode === "ADD_5")
     {
-        return res.redirect(`${paramURL}?error=ADD_5`);
+        return res.redirect(`${paramURL}?error=ADD_5`); // Catway introuvable
     }
     if (isNaN(DateDebut) || isNaN(DateFin)) {
         console.error("Erreur : Date invalide détectée !");
@@ -374,31 +367,26 @@ exports.add = async (req, res, next) => {
     if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
     {
         req.session.formData = req.body;
-        return res.redirect(`${paramURL}?error=ADD_1`);
-        //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+        return res.redirect(`${paramURL}?error=ADD_1`); // Les champs doivent tous être renseignés.
     }
     if (DateDebut < DateAct) {
         req.session.formData = req.body;
-        return res.redirect(`${paramURL}?error=ADD_2`);
-        //return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+        return res.redirect(`${paramURL}?error=ADD_2`); // La date de début doit être ultérieure à la date actuelle.
     }
     if (DateDebut > DateFin) {
         req.session.formData = req.body;
-        return res.redirect(`${paramURL}?error=ADD_3`);
-        //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+        return res.redirect(`${paramURL}?error=ADD_3`); // "La date de début ne peut être postérieure à la date de fin.
     }
 
     try {
         const presentReservation = await checkReservation(temp.catwayNumber, DateDebut, DateFin);
         if (presentReservation) {
             req.session.formData = req.body;
-            return res.redirect(`${paramURL}?error=ADD_4`);
-            //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+            return res.redirect(`${paramURL}?error=ADD_4`); // Une réservation existe déjà sur ce créneau.
         }
         let reservation = await Reservation.create(temp);
         req.session.formData = null;
         return res.redirect(`${paramURL}?success=ADD`);
-        //return res.status(201).json(reservation);
     } catch (error) {
         // Code erreur de MongoDB de duplication
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
@@ -411,7 +399,6 @@ exports.add = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -430,7 +417,7 @@ exports.add = async (req, res, next) => {
  * @param {object} req - Objet de la requête avec les données de la réservation à mettre à jour.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec la réservation mise à jour ou une erreur
+ * @returns {Response} - Renvoie une réponse de suppression ou une erreur.
  */
 exports.update = async (req, res, next) => {
     const idReservation = req.params.idReservation;
@@ -454,12 +441,11 @@ exports.update = async (req, res, next) => {
     console.log(temp);
     if (req.errorCode === "ADD_5")
     {
-        return res.redirect(`${paramURL}/${idReservation}?error=UPD_5`);
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_5`); // Catway non trouvé
     }
     if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
     {
-        return res.redirect(`${paramURL}/${idReservation}?error=UPD_1`);
-        //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_1`); // Les champs doivent tous être renseignés.
     }
 
     let DateDebut = new Date(temp.startDate);
@@ -468,7 +454,7 @@ exports.update = async (req, res, next) => {
 
     let reservation = await Reservation.findOne({ _id: idReservation });
     if (!reservation) {
-        return res.redirect(`${paramURL}?error=RSV_1`);
+        return res.redirect(`${paramURL}?error=RSV_1`); // Réservation non trouvée
     }
 
     if (isNaN(DateDebut) || isNaN(DateFin)) {
@@ -478,21 +464,19 @@ exports.update = async (req, res, next) => {
 
     if (new Date(reservation.startDate) > DateAct) { // Date existante avant jour actuel, alors on ignore cette vérification
         if (DateDebut <= DateAct) {
-            return res.redirect(`${paramURL}/${idReservation}?error=UPD_2`); 
+            return res.redirect(`${paramURL}/${idReservation}?error=UPD_2`); // La date doit être postérieure à aujourd'hui
         }
     }
     else {
         temp.startDate = reservation.startDate;
     }
     if (DateDebut > DateFin) {
-        return res.redirect(`${paramURL}/${idReservation}?error=UPD_3`);
-        //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_3`); // La date de début ne peut être postérieure à la date de fin.
     }
 
     const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate, idReservation);
     if (presentReservation) {
-        return res.redirect(`${paramURL}/${idReservation}?error=UPD_4`);
-        //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_4`); // Une réservation existe déjà sur ce créneau.
     }
 
     try {
@@ -503,7 +487,6 @@ exports.update = async (req, res, next) => {
         if (reservation) {
             Object.assign(reservation, temp);
             await reservation.save({ validateModifiedOnly: true });
-            //return res.status(201).json(user);
             return res.redirect(`${paramURL}/${idReservation}?success=UPD`);
         }
 
@@ -521,7 +504,6 @@ exports.update = async (req, res, next) => {
                 message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
             })
         }
-        //return res.status(501).json(error)
         // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
         console.error(error);
         req.session.formData = null;
@@ -540,7 +522,7 @@ exports.update = async (req, res, next) => {
  * @param {object} req - Objet de la requête avec les données de la réservation à supprimer.
  * @param {object} res - L'objet de réponse Express.
  * @param {function} next - La fonction middleware suivante
- * @returns {Response} Retourne une réponse JSON avec la réservation supprimée ou une erreur
+ * @returns {Response} - Renvoie une réponse de suppression ou une erreur.
  */
 exports.delete = async (req, res, next) => {
     const idReservation = req.params.idReservation

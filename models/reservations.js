@@ -7,6 +7,7 @@ const Schema = mongoose.Schema;
  *  schemas:
  *      Reservation:
  *          type: object
+ *          description: "Représente une réservation pour un catway dans le port de plaisance, incluant les informations du client et du bateau, ainsi que les dates de la réservation."
  *          required:
  *              - catwayNumber
  *              - clientName
@@ -30,7 +31,7 @@ const Schema = mongoose.Schema;
  *                  type: date
  *                  description: Date de fin de la réservation
  *          example:
- *              catwayNumber: "12"
+ *              catwayNumber: 12
  *              clientName: "John Doe"
  *              boatName: "Titanic"
  *              startDate: "2025-02-02"

@@ -1,3 +1,10 @@
+/**
+ * @swagger
+ * tags:
+ *   name: Error
+ *   description: Gestion des erreurs de l'application
+ */
+
 var express = require('express');
 var router = express.Router();
 // Import du middleware pour privatisation
@@ -72,9 +79,55 @@ router.post('/login', service.authenticate);
  *       - "Users"
  *     summary: "Déconnecte un utilisateur"
  *     description: "Déconnecte l'utilisateur en supprimant les cookies de sécurité JWT."
+ *     responses:
+ *       200:
+ *         description: "Déconnexion réussie"
+ *       500:
+ *         description: "Erreur serveur"
  */
 router.get('/logout', service.logout);
 
+/**
+ * @swagger
+ * /error:
+ *   get:
+ *     tags:
+ *       - "Error"
+ *     summary: "Affiche une page d'erreur"
+ *     description: "Affiche une page d'erreur avec un message et un code d'erreur personnalisés."
+ *     parameters:
+ *       - name: errorCode
+ *         in: query
+ *         description: "Code d'erreur (par défaut 500)"
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "500"
+ *       - name: title
+ *         in: query
+ *         description: "Titre de l'erreur"
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "Erreur inconnue"
+ *       - name: message
+ *         in: query
+ *         description: "Message détaillé de l'erreur"
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "Une erreur est survenue."
+ *     responses:
+ *       200:
+ *         description: "Page d'erreur affichée avec succès"
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: "<html>Erreur affichée</html>"
+ *       500:
+ *         description: "Erreur serveur"
+ */
 router.get('/error', (req, res) => {
   const { errorCode, title, message } = req.query;
   
