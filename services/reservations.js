@@ -25,7 +25,7 @@ exports.checkCatwayExists = async (req, res, next) => {
         const catway = await Catway.findOne({ catwayNumber: id });
 
         if (!catway) {
-            return res.redirect('/reservations?error=ADD_5')
+            req.errorCode = "ADD_5";
         }
 
         req.catway = catway;
@@ -217,6 +217,17 @@ exports.getById = async (req, res, next) => {
         let reservations = await Reservation.findOne({ _id: idReservation });
 
         if (reservations) {
+            let catwayInfo = await Catway.findOne( { catwayNumber: reservations.catwayNumber });
+
+            if (catwayInfo)
+            {
+                const catwayType = catwayInfo.catwayType;
+                res.locals.catwayType = catwayType;
+            } else {
+                res.locals.catwayType = null;
+            }
+
+            
             res.locals.reservations = reservations;
             return next();
             //return res.status(200).json(reservations);
@@ -293,13 +304,15 @@ exports.add = async (req, res, next) => {
         endDate: req.body.endDate,
         catwayType: req.body.catwayType
     });
-    console.log('Date envoyée par le body : ', temp.startDate, temp.endDate);
 
     let DateDebut = new Date(temp.startDate);
     let DateFin = new Date(temp.endDate);
     let DateAct = new Date().setHours(0, 0, 0, 0);
-    console.log("Date transformée : ", DateAct, DateDebut, DateFin);
 
+    if (req.errorCode === "ADD_5")
+    {
+        return res.redirect('/reservations?error=ADD_5');
+    }
     if (isNaN(DateDebut) || isNaN(DateFin)) {
         console.error("Erreur : Date invalide détectée !");
         return res.redirect('/reservations?error=DATE_INVALID');
@@ -377,26 +390,48 @@ exports.update = async (req, res, next) => {
         startDate: req.body.startDate,
         endDate: req.body.endDate
     });
-
+    console.log(temp);
+    if (req.errorCode === "ADD_5")
+    {
+        return res.redirect(`/reservations/${idReservation}?error=UPD_5`);
+    }
     if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
     {
-        return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+        return res.redirect(`/reservations/${idReservation}?error=UPD_1`);
+        //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
     }
 
-    let DateDebut = new Date(temp.startDate).toISOString();
-    let DateFin = new Date(temp.endDate).toISOString();
-    let DateAct = new Date().toISOString();
-    
-    if (DateDebut <= DateAct) {
-        return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+    let DateDebut = new Date(temp.startDate);
+    let DateFin = new Date(temp.endDate);
+    let DateAct = new Date().setHours(0, 0, 0, 0);
+
+    let reservation = await Reservation.findOne({ _id: idReservation });
+    if (!reservation) {
+        return res.redirect(`/reservations?error=RSV_1`);
+    }
+
+    if (isNaN(DateDebut) || isNaN(DateFin)) {
+        console.error("Erreur : Date invalide détectée !");
+        return res.redirect(`/reservations/${idReservation}?error=DATE_INVALID`);
+    }
+
+    if (new Date(reservation.startDate) > DateAct) { // Date existante avant jour actuel, alors on ignore cette vérification
+        if (DateDebut <= DateAct) {
+            return res.redirect(`/reservations/${idReservation}?error=UPD_2`); 
+        }
+    }
+    else {
+        temp.startDate = reservation.startDate;
     }
     if (DateDebut > DateFin) {
-        return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+        return res.redirect(`/reservations/${idReservation}?error=UPD_3`);
+        //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
     const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
     if (presentReservation) {
-        return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+        return res.redirect(`/reservations/${idReservation}?error=UPD_4`);
+        //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
     }
 
     try {
@@ -405,17 +440,14 @@ exports.update = async (req, res, next) => {
         let reservation = await Reservation.findOne({_id : idReservation});
 
         if (reservation) {
-            Object.keys(temp).forEach((key) => {
-                if (!!temp[key]) {
-                    reservation[key] = temp[key];
-                }
-            });
-
-            await reservation.save();
-            return res.status(201).json(reservation);
+            Object.assign(reservation, temp);
+            await reservation.save({ validateModifiedOnly: true });
+            //return res.status(201).json(user);
+            return res.redirect(`/reservations/${idReservation}?success=UPD`);
         }
 
-        return res.status(404).json('Réservation non trouvée');
+        
+        return res.redirect(`/reservations?error=RSV_1`);
     } catch (error) {
         // Code erreur de MongoDB de duplication
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {

@@ -6,6 +6,7 @@ const serviceReservation = require('../services/reservations');
 const session = require('express-session'); 
 // Import du middleware pour privatisation
 const private = require('../middlewares/private');
+const Catway = require('../models/catways');
 
 /**
  * @swagger
@@ -159,29 +160,26 @@ router.get('/:idReservation', private.checkJWT, serviceReservation.checkReservat
 
     // Définir le message de succès basé sur le code
     switch (successCode) {
-        case "ADD":
-            message = "Réservation créée avec succès.";
-            break;
-        case "DEL":
-            message = "Réservation supprimée avec succès.";
+        case "PUT":
+            message = "Réservation modifiée avec succès.";
             break;
     }
 
     // Définir le message d'erreur basé sur le code
     switch (errorCode) {
-        case "ADD_1":
+        case "UPD_1":
             errorMessageCreate = "Les champs doivent tous être renseignés.";
             break;
-        case "ADD_2":
+        case "UPD_2":
             errorMessageCreate = "La date de début doit être ultérieure à la date actuelle.";
             break;
-        case "ADD_3":
+        case "UPD_3":
             errorMessageCreate = "La date de début ne peut être postérieure à la date de fin.";
             break;
-        case "ADD_4":
+        case "UPD_4":
             errorMessageCreate = "Une réservation existe déjà sur ce catway.";
             break;
-        case "ADD_5":
+        case "UPD_5":
             errorMessageCreate = "Le catway choisi est introuvable.";
             break;
         case "DATE_INVALID":
