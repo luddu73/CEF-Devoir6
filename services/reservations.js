@@ -328,32 +328,38 @@ exports.add = async (req, res, next) => {
         catwayType: req.body.catwayType
     });
 
+    if (req.params.id && !req.body.catwayNumber) {
+        paramURL = `/catways/${temp.catwayNumber}`;
+    } else {
+        paramURL = "/reservations";
+    }
+
     let DateDebut = new Date(temp.startDate);
     let DateFin = new Date(temp.endDate);
     let DateAct = new Date().setHours(0, 0, 0, 0);
 
     if (req.errorCode === "ADD_5")
     {
-        return res.redirect('/reservations?error=ADD_5');
+        return res.redirect(`${paramURL}?error=ADD_5`);
     }
     if (isNaN(DateDebut) || isNaN(DateFin)) {
         console.error("Erreur : Date invalide détectée !");
-        return res.redirect('/reservations?error=DATE_INVALID');
+        return res.redirect(`${paramURL}?error=DATE_INVALID`);
     }
-    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate || !temp.catwayType)
+    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
     {
         req.session.formData = req.body;
-        return res.redirect('/reservations?error=ADD_1');
+        return res.redirect(`${paramURL}?error=ADD_1`);
         //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
     }
     if (DateDebut < DateAct) {
         req.session.formData = req.body;
-        return res.redirect('/reservations?error=ADD_2');
+        return res.redirect(`${paramURL}?error=ADD_2`);
         //return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
     }
     if (DateDebut > DateFin) {
         req.session.formData = req.body;
-        return res.redirect('/reservations?error=ADD_3');
+        return res.redirect(`${paramURL}?error=ADD_3`);
         //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
@@ -361,12 +367,12 @@ exports.add = async (req, res, next) => {
         const presentReservation = await checkReservation(temp.catwayNumber, DateDebut, DateFin);
         if (presentReservation) {
             req.session.formData = req.body;
-            return res.redirect('/reservations?error=ADD_4');
+            return res.redirect(`${paramURL}?error=ADD_4`);
             //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
         }
         let reservation = await Reservation.create(temp);
         req.session.formData = null;
-        return res.redirect('/reservations?success=ADD');
+        return res.redirect(`${paramURL}?success=ADD`);
         //return res.status(201).json(reservation);
     } catch (error) {
         // Code erreur de MongoDB de duplication

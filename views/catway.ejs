@@ -234,6 +234,28 @@
                                     function closeModalDelete() {
                                         document.getElementById("deleteModal").classList.add("hidden");
                                     }
+
+                                    function deleteReservation(idReservation) {
+                                        // Effectuer la requête pour supprimer l'utilisateur
+                                        fetch(`/catways/<%= catways.catwayNumber %>/reservations/${idReservation}`, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                window.location.href = `/catways/<%= catways.catwayNumber %>?success=DEL`;
+                                            } else {
+                                                window.location.href = `/catways/<%= catways.catwayNumber %>?error=${data.errorInfo}`;
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Erreur:', error);
+                                            window.location.href = `/error?errorCode=500&title=Erreur+Interne&message=Une+erreur+inattendue+est+survenue`;
+                                        });
+                                    }
                                 </script>
                             </table>
                             <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
@@ -272,7 +294,7 @@
                               <%= errorMessageCreate %>
                             </div>
                             <% } %>
-                          <form action="/reservations/<%= catways.catwayNumber %>" method="post" class="flex flex-col gap-2">
+                          <form action="/catways/<%= catways.catwayNumber %>/reservations" method="post" class="flex flex-col gap-2">
                                 <h3 class="text-xl font-semibold mb-2">Informations sur la réservation</h3>
                                 <div class="relative flex" id="clientNameInput">
                                     <input id="clientName" name="clientName" type="text" placeholder="Nom du client" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.clientName ? session.formData.clientName : '' %>" >

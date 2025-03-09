@@ -153,7 +153,10 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
             message = "Catway modifié avec succès.";
             break;
         case "ADD":
-            message = "Réservation créer avec succès.";
+            message = "Réservation créee avec succès.";
+            break;
+        case "DEL":
+            message = "Réservation supprimée avec succès.";
             break;
     }
 
