@@ -146,10 +146,14 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
     const successCode = req.query.success;
     let errorMessage = null;
     let message = null;
+    const today = new Date().toISOString().split('T')[0];
 
     switch (successCode) {
         case "UPD":
             message = "Catway modifié avec succès.";
+            break;
+        case "ADD":
+            message = "Réservation créer avec succès.";
             break;
     }
 
@@ -157,6 +161,25 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
     switch (errorCode) {
         case "UPD_1":
             errorMessage = "Vous devez renseigner un état.";
+            break;
+        
+        case "ADD_1":
+            errorMessageCreate = "Les champs doivent tous être renseignés.";
+            break;
+        case "ADD_2":
+            errorMessageCreate = "La date de début doit être ultérieure à la date actuelle.";
+            break;
+        case "ADD_3":
+            errorMessageCreate = "La date de début ne peut être postérieure à la date de fin.";
+            break;
+        case "ADD_4":
+            errorMessageCreate = "Une réservation existe déjà sur ce catway.";
+            break;
+        case "ADD_5":
+            errorMessageCreate = "Le catway choisi est introuvable.";
+            break;
+        case "DATE_INVALID":
+            errorMessageCreate = "Les dates envoyées ne sont pas valides.";
             break;
         default:
             errorMessage = errorCode;
@@ -167,6 +190,7 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
         currentPage: 'catways',
         errorMessage: errorMessage,
         message: message,
+        today: today,
         formData: req.session.formData  // Passe formData dans la vue
       });
 });
