@@ -25,14 +25,37 @@ exports.checkCatwayExists = async (req, res, next) => {
         const catway = await Catway.findOne({ catwayNumber: id });
 
         if (!catway) {
-            return res.status(404).json('Catway non trouvé');
+            req.errorCode = "ADD_5";
         }
 
         req.catway = catway;
         next();
     }
     catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/catways?error=ADD_3`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 /**
@@ -80,25 +103,25 @@ exports.checkReservationCatwayExists = async (req, res, next) => {
 exports.checkReservationExists = async (req, res, next) => {
     
     const objectIdReservation = req.params.idReservation;
-    console.log("Paramètre reçu :", req.params.idReservation);
     if (!mongoose.Types.ObjectId.isValid(objectIdReservation)) {
-        return res.status(400).json({ error: "L'id Reservation est invalide." });
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur ObjectID',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 
     try {
-        const idReservation = new mongoose.Types.ObjectId(objectIdReservation);
-
-        const reservation = await Reservation.findOne({ _id: idReservation });
-
-        if (!reservation) {
-            return res.status(404).json('Réservation non trouvée');
-        }
-
-        req.reservation = reservation;
         next();
     }
     catch (error) {
-        return res.status(501).json(error);
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '501',
+            title: 'Erreur ObjectID',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
@@ -116,15 +139,38 @@ exports.checkReservationExists = async (req, res, next) => {
  */
 exports.getAll = async (req, res, next) => {
     try {
-        let reservations = await Reservation.find();
+        let reservations = await Reservation.find().sort({ endDate:-1, startDate:-1 });
 
         if (reservations.length > 0) {
-            return res.status(200).json(reservations);
+            res.locals.reservations = reservations;
+            return next();
         }
 
-        return res.status(404).json('Aucune réservation trouvée');
+        console.log("Aucune réservation trouvée");
+        res.locals.reservations = reservations;
+        res.errorMessage = "Aucune réservation trouvée";
+        return next();
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
@@ -168,15 +214,47 @@ exports.getById = async (req, res, next) => {
         
         const idReservation = new mongoose.Types.ObjectId(req.params.idReservation);
 
-        let reservations = await Reservation.find({ _id: idReservation });
+        let reservations = await Reservation.findOne({ _id: idReservation });
 
-        if (reservations.length > 0) {
-            return res.status(200).json(reservations);
+        if (reservations) {
+            let catwayInfo = await Catway.findOne( { catwayNumber: reservations.catwayNumber });
+
+            if (catwayInfo)
+            {
+                const catwayType = catwayInfo.catwayType;
+                res.locals.catwayType = catwayType;
+            } else {
+                res.locals.catwayType = null;
+            }
+
+            
+            res.locals.reservations = reservations;
+            return next();
+            //return res.status(200).json(reservations);
         }
 
-        return res.status(404).json('Aucune réservation trouvée');
+        return res.redirect('/reservations?error=RSV_1');
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
@@ -185,6 +263,7 @@ exports.getById = async (req, res, next) => {
  * @async
  * @function checkReservation
  * @param {number} catwayNumber - Numéro du catway choisi
+ * @param {string} catwayType - Le type de catway attendu
  * @param {Date} startDate - Date de début de la réservation souhaitée.
  * @param {Date} endDate - Date de fin de la réservation souhaitée.
  * @returns {Response} Retourne une réponse JSON qui indique la présence ou non d'une réservation sur la période choisie ou une erreur
@@ -202,7 +281,7 @@ const checkReservation = async (catwayNumber, startDate, endDate) => {
 
         return presentReservation;
     } catch (error) {
-        return res.status(501).json(error);
+        throw error;
     }
 }
 
@@ -222,34 +301,71 @@ exports.add = async (req, res, next) => {
         clientName: req.body.clientName,
         boatName: req.body.boatName,
         startDate: req.body.startDate,
-        endDate: req.body.endDate
+        endDate: req.body.endDate,
+        catwayType: req.body.catwayType
     });
 
     let DateDebut = new Date(temp.startDate);
     let DateFin = new Date(temp.endDate);
-    let DateAct = new Date();
-    
-    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
+    let DateAct = new Date().setHours(0, 0, 0, 0);
+
+    if (req.errorCode === "ADD_5")
     {
-        return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+        return res.redirect('/reservations?error=ADD_5');
     }
-    if (DateDebut <= DateAct) {
-        return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+    if (isNaN(DateDebut) || isNaN(DateFin)) {
+        console.error("Erreur : Date invalide détectée !");
+        return res.redirect('/reservations?error=DATE_INVALID');
+    }
+    if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate || !temp.catwayType)
+    {
+        req.session.formData = req.body;
+        return res.redirect('/reservations?error=ADD_1');
+        //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+    }
+    if (DateDebut < DateAct) {
+        req.session.formData = req.body;
+        return res.redirect('/reservations?error=ADD_2');
+        //return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
     }
     if (DateDebut > DateFin) {
-        return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+        req.session.formData = req.body;
+        return res.redirect('/reservations?error=ADD_3');
+        //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
     try {
-        const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
+        const presentReservation = await checkReservation(temp.catwayNumber, DateDebut, DateFin);
         if (presentReservation) {
-            return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+            req.session.formData = req.body;
+            return res.redirect('/reservations?error=ADD_4');
+            //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
         }
         let reservation = await Reservation.create(temp);
-
-        return res.status(201).json(reservation);
+        req.session.formData = null;
+        return res.redirect('/reservations?success=ADD');
+        //return res.status(201).json(reservation);
     } catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 
@@ -274,26 +390,48 @@ exports.update = async (req, res, next) => {
         startDate: req.body.startDate,
         endDate: req.body.endDate
     });
-
+    console.log(temp);
+    if (req.errorCode === "ADD_5")
+    {
+        return res.redirect(`/reservations/${idReservation}?error=UPD_5`);
+    }
     if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
     {
-        return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
+        return res.redirect(`/reservations/${idReservation}?error=UPD_1`);
+        //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
     }
 
     let DateDebut = new Date(temp.startDate);
     let DateFin = new Date(temp.endDate);
-    let DateAct = new Date();
-    
-    if (DateDebut <= DateAct) {
-        return res.status(400).json({ error: "La date de début doit être ultérieure à la date actuelle."});
+    let DateAct = new Date().setHours(0, 0, 0, 0);
+
+    let reservation = await Reservation.findOne({ _id: idReservation });
+    if (!reservation) {
+        return res.redirect(`/reservations?error=RSV_1`);
+    }
+
+    if (isNaN(DateDebut) || isNaN(DateFin)) {
+        console.error("Erreur : Date invalide détectée !");
+        return res.redirect(`/reservations/${idReservation}?error=DATE_INVALID`);
+    }
+
+    if (new Date(reservation.startDate) > DateAct) { // Date existante avant jour actuel, alors on ignore cette vérification
+        if (DateDebut <= DateAct) {
+            return res.redirect(`/reservations/${idReservation}?error=UPD_2`); 
+        }
+    }
+    else {
+        temp.startDate = reservation.startDate;
     }
     if (DateDebut > DateFin) {
-        return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
+        return res.redirect(`/reservations/${idReservation}?error=UPD_3`);
+        //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
     const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
     if (presentReservation) {
-        return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
+        return res.redirect(`/reservations/${idReservation}?error=UPD_4`);
+        //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
     }
 
     try {
@@ -302,20 +440,36 @@ exports.update = async (req, res, next) => {
         let reservation = await Reservation.findOne({_id : idReservation});
 
         if (reservation) {
-            Object.keys(temp).forEach((key) => {
-                if (!!temp[key]) {
-                    reservation[key] = temp[key];
-                }
-            });
-
-            await reservation.save();
-            return res.status(201).json(reservation);
+            Object.assign(reservation, temp);
+            await reservation.save({ validateModifiedOnly: true });
+            //return res.status(201).json(user);
+            return res.redirect(`/reservations/${idReservation}?success=UPD`);
         }
 
-        return res.status(404).json('Réservation non trouvée');
+        
+        return res.redirect(`/reservations?error=RSV_1`);
     } catch (error) {
-        return res.status(501).json(error)
-    } 
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
+    }
 }
 
 /**
@@ -331,10 +485,34 @@ exports.delete = async (req, res, next) => {
     const idReservation = req.params.idReservation
 
     try {
-        await Reservation.deleteOne({_id : idReservation});
-
-        return res.status(204).json('Réservation supprimée');
+        let reservation = await Reservation.findOne({_id : idReservation});
+        
+        if (reservation) {
+            await Reservation.deleteOne({_id : idReservation});
+            return res.json({success: true});
+        }
+        console.warn(`Réservation ${idReservation} non trouvée.`);
+        return res.json({success: false, errorInfo: "DEL_1"}); // Utilisateur non trouvé
     } catch (error) {
-        return res.status(501).json(error)
-    } 
+        // Code erreur de MongoDB de duplication
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
+    }
 }

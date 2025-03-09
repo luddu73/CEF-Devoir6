@@ -3,8 +3,10 @@ var router = express.Router();
 
 const serviceReservation = require('../services/reservations');
 
+const session = require('express-session'); 
 // Import du middleware pour privatisation
 const private = require('../middlewares/private');
+const Catway = require('../models/catways');
 
 /**
  * @swagger
@@ -43,7 +45,64 @@ const private = require('../middlewares/private');
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/', private.checkJWT, serviceReservation.getAll);
+router.get('/', private.checkJWT, serviceReservation.getAll, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let errorMessage = null;
+    let message = null;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Définir le message de succès basé sur le code
+    switch (successCode) {
+        case "ADD":
+            message = "Réservation créée avec succès.";
+            break;
+        case "DEL":
+            message = "Réservation supprimée avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "ADD_1":
+            errorMessageCreate = "Les champs doivent tous être renseignés.";
+            break;
+        case "ADD_2":
+            errorMessageCreate = "La date de début doit être ultérieure à la date actuelle.";
+            break;
+        case "ADD_3":
+            errorMessageCreate = "La date de début ne peut être postérieure à la date de fin.";
+            break;
+        case "ADD_4":
+            errorMessageCreate = "Une réservation existe déjà sur ce catway.";
+            break;
+        case "ADD_5":
+            errorMessageCreate = "Le catway choisi est introuvable.";
+            break;
+        case "DATE_INVALID":
+            errorMessageCreate = "Les dates envoyées ne sont pas valides.";
+            break;
+        case "DEL_1":
+            errorMessage = "La réservation à supprimer n'a pas été trouvée.";
+            break;
+        case "RSV_1":
+            errorMessage = "La réservation n'a pas été trouvée.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+
+    res.render('reservations', { 
+        currentPage: 'reservations',
+        errorMessageCreate: errorMessageCreate,
+        errorMessage: errorMessage,
+        message: message,
+        today: today,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger
@@ -91,7 +150,58 @@ router.get('/', private.checkJWT, serviceReservation.getAll);
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:idReservation', private.checkJWT, serviceReservation.checkReservationExists, serviceReservation.getById);
+router.get('/:idReservation', private.checkJWT, serviceReservation.checkReservationExists, serviceReservation.getById, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let errorMessage = null;
+    let message = null;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Définir le message de succès basé sur le code
+    switch (successCode) {
+        case "PUT":
+            message = "Réservation modifiée avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "UPD_1":
+            errorMessageCreate = "Les champs doivent tous être renseignés.";
+            break;
+        case "UPD_2":
+            errorMessageCreate = "La date de début doit être ultérieure à la date actuelle.";
+            break;
+        case "UPD_3":
+            errorMessageCreate = "La date de début ne peut être postérieure à la date de fin.";
+            break;
+        case "UPD_4":
+            errorMessageCreate = "Une réservation existe déjà sur ce catway.";
+            break;
+        case "UPD_5":
+            errorMessageCreate = "Le catway choisi est introuvable.";
+            break;
+        case "DATE_INVALID":
+            errorMessageCreate = "Les dates envoyées ne sont pas valides.";
+            break;
+        case "DEL_1":
+            errorMessage = "La réservation à supprimer n'a pas été trouvée.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+
+    res.render('reservation', { 
+        currentPage: 'reservations',
+        errorMessageCreate: errorMessageCreate,
+        errorMessage: errorMessage,
+        message: message,
+        today: today,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger

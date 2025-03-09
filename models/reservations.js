@@ -59,9 +59,12 @@ const Reservation = new Schema({
         required: [true, "La date de début de la réservation doit être renseignée."],
         validate: {
             validator: function (startDate) {
-                const actualDate = new Date();
-                actualDate.setHours(0, 0, 0, 0); // Remise à zéro de l'heure
-                return startDate >= actualDate;
+                if (this.isModified('startDate')) {
+                    const actualDate = new Date();
+                    actualDate.setHours(0, 0, 0, 0); // Remise à zéro de l'heure
+                    return startDate >= actualDate;
+                }
+                return true;
             },
             message: "La date de début ne peut être postérieure à aujourd'hui."
         }
@@ -79,6 +82,6 @@ const Reservation = new Schema({
     }
 });
 
-Reservation.index({ catwatNumber: 1 });  // On créer un index pour améliorer les performances, car on recherche souvent par catway. 1 signifie croissant.
+Reservation.index({ catwayNumber: 1 });  // On créer un index pour améliorer les performances, car on recherche souvent par catway. 1 signifie croissant.
 
 module.exports = mongoose.model('reservations', Reservation);
