@@ -146,10 +146,17 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
     const successCode = req.query.success;
     let errorMessage = null;
     let message = null;
+    const today = new Date().toISOString().split('T')[0];
 
     switch (successCode) {
         case "UPD":
             message = "Catway modifié avec succès.";
+            break;
+        case "ADD":
+            message = "Réservation créee avec succès.";
+            break;
+        case "DEL":
+            message = "Réservation supprimée avec succès.";
             break;
     }
 
@@ -157,6 +164,28 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
     switch (errorCode) {
         case "UPD_1":
             errorMessage = "Vous devez renseigner un état.";
+            break;
+        
+        case "ADD_1":
+            errorMessageCreate = "Les champs doivent tous être renseignés.";
+            break;
+        case "ADD_2":
+            errorMessageCreate = "La date de début doit être ultérieure à la date actuelle.";
+            break;
+        case "ADD_3":
+            errorMessageCreate = "La date de début ne peut être postérieure à la date de fin.";
+            break;
+        case "ADD_4":
+            errorMessageCreate = "Une réservation existe déjà sur ce catway.";
+            break;
+        case "ADD_5":
+            errorMessageCreate = "Le catway choisi est introuvable.";
+            break;
+        case "RSV_1":
+            errorMessage = "Aucune réservation correspondante sur ce catway.";
+            break;
+        case "DATE_INVALID":
+            errorMessageCreate = "Les dates envoyées ne sont pas valides.";
             break;
         default:
             errorMessage = errorCode;
@@ -167,6 +196,7 @@ router.get('/:id', private.checkJWT, service.getById, function(req, res, next) {
         currentPage: 'catways',
         errorMessage: errorMessage,
         message: message,
+        today: today,
         formData: req.session.formData  // Passe formData dans la vue
       });
 });
@@ -371,7 +401,60 @@ router.get('/:id/reservations', private.checkJWT, serviceReservation.checkCatway
  *       501:
  *         description: "Erreur serveur."
  */
-router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.checkReservationCatwayExists, serviceReservation.getById);
+router.get('/:id/reservations/:idReservation', private.checkJWT, serviceReservation.checkCatwayExists, serviceReservation.checkReservationCatwayExists, serviceReservation.getById, function(req, res, next) {
+    const errorCode = req.query.error;
+    const successCode = req.query.success;
+    let errorMessageCreate = null;
+    let errorMessage = null;
+    let message = null;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Définir le message de succès basé sur le code
+    switch (successCode) {
+        case "UPD":
+            message = "Réservation modifiée avec succès.";
+            break;
+    }
+
+    // Définir le message d'erreur basé sur le code
+    switch (errorCode) {
+        case "UPD_1":
+            errorMessageCreate = "Les champs doivent tous être renseignés.";
+            break;
+        case "UPD_2":
+            errorMessageCreate = "La date de début doit être ultérieure à la date actuelle.";
+            break;
+        case "UPD_3":
+            errorMessageCreate = "La date de début ne peut être postérieure à la date de fin.";
+            break;
+        case "UPD_4":
+            errorMessageCreate = "Une réservation existe déjà sur ce catway.";
+            break;
+        case "UPD_5":
+            errorMessageCreate = "Le catway choisi est introuvable.";
+            break;
+        case "DATE_INVALID":
+            errorMessageCreate = "Les dates envoyées ne sont pas valides.";
+            break;
+        case "DEL_1":
+            errorMessage = "La réservation à supprimer n'a pas été trouvée.";
+            break;
+        default:
+            errorMessageCreate = errorCode;
+            break;
+    }
+
+    res.render('catway-reservation', { 
+        precedatePage: `/catways/${req.params.id}`,
+        infoCatwayNumber: `${req.params.id}`,
+        currentPage: 'catwaysview',
+        errorMessageCreate: errorMessageCreate,
+        errorMessage: errorMessage,
+        message: message,
+        today: today,
+        formData: req.session.formData  // Passe formData dans la vue
+      });
+});
 
 /**
  * @swagger

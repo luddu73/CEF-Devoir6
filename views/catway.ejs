@@ -61,12 +61,282 @@
                                     submitButton.classList.remove("hidden");
                                 }
                             </script>
-                            </section>
-                            <hr>
-                            <section>
-                                <h2 class="mt-2 text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Liste des réservations du catway N°<%= catways.catwayNumber %> </h2>
-                            </section>
+                        </section>
+                        <hr>
+                        <section>
+                            <h2 class="mt-2 text-blue-900 text-lg font-bold mb-2"><i class="fa-solid fa-calendar-days"></i> Liste des réservations du catway N°<%= catways.catwayNumber %> </h2>
+                            <button onclick="openModal()" id="createReservation" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                <i class="fa-solid fa-add"></i> Ajouter une réservation
+                            </button>
+                            <table class="min-w-full divide-y divide-gray-300 mt-2">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Client</th>
+                                        <th scope="col" class="hidden xl:table-cell px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Bâteau</th>
+                                        <th scope="col" class="hidden xl:table-cell px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Date de début</th>
+                                        <th scope="col" class="hidden xl:table-cell px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900">Date de fin</th>
+                                        <th scope="col" class="xl:table-cell px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900"></th>
+                                        <th scope="col" class="px-3 py-3.5 text-left text-xs xl:text-sm font-semibold text-gray-900"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white" id="reservationsContainer">
+                                    <tr>
+                                        <td colspan="6" class="py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6">Chargement en cours.</td>
+                                    </tr>
+                                </tbody>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        fetch(`/catways/<%= catways.catwayNumber %>/reservations`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                console.log("Réponse brute :", data);
+                                                const reservationsContainer = document.getElementById('reservationsContainer');
+                                                
+                                                if (data.length > 0) {
+                                                    reservationsContainer.innerHTML = "";
+                                                    data.forEach(reservation => 
+                                                    {
+                                                        let newTr = document.createElement("tr");
+
+                                                        let newTd1 = document.createElement("td");
+                                                        newTr.appendChild(newTd1);
+                                                        let newTextClientName = document.createTextNode(reservation.clientName);
+                                                        newTd1.appendChild(newTextClientName);
+                                                        newTd1.setAttribute("class", "px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500");
+                                                        reservationsContainer.appendChild(newTr);
+
+                                                        let newTd2 = document.createElement("td");
+                                                        newTr.appendChild(newTd2);
+                                                        let newTextBoatName = document.createTextNode(reservation.boatName);
+                                                        newTd2.appendChild(newTextBoatName);
+                                                        newTd2.setAttribute("class", "hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500");
+                                                        reservationsContainer.appendChild(newTr);
+
+                                                        let newTd3 = document.createElement("td");
+                                                        newTr.appendChild(newTd3);
+                                                        let newTextStartDate = document.createTextNode(new Date(reservation.startDate).toLocaleDateString().slice(0, 10));
+                                                        newTd3.appendChild(newTextStartDate);
+                                                        newTd3.setAttribute("class", "hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500");
+                                                        reservationsContainer.appendChild(newTr);
+
+                                                        let newTd4 = document.createElement("td");
+                                                        newTr.appendChild(newTd4);
+                                                        let newTextEndDate = document.createTextNode(new Date(reservation.endDate).toLocaleDateString().slice(0, 10));
+                                                        newTd4.appendChild(newTextEndDate);
+                                                        newTd4.setAttribute("class", "hidden xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500");
+                                                        reservationsContainer.appendChild(newTr);
+
+                                                        let newTd5 = document.createElement("td");
+                                                        newTr.appendChild(newTd5);
+                                                        let newSpan1 = document.createElement("span");
+                                                        newTd5.setAttribute("class", "xl:table-cell px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-gray-500");
+                                                        newTd5.appendChild(newSpan1);
+                                                        if (new Date(reservation.startDate) < new Date() && new Date(reservation.endDate) > new Date()) {
+                                                            newSpan1.setAttribute("class", "inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800");
+                                                            let newTextSpan1 = document.createTextNode("En cours");
+                                                            newSpan1.appendChild(newTextSpan1);
+                                                        }
+                                                        if (new Date(reservation.endDate) < new Date()) {
+                                                            newSpan1.setAttribute("class", "inline-flex items-center rounded-full bg-pink-100 px-2 py-1 text-xs font-medium text-pink-800");
+                                                            let newTextSpan1 = document.createTextNode("Terminée");
+                                                            newSpan1.appendChild(newTextSpan1);
+                                                        }
+                                                        if (new Date(reservation.startDate) > new Date()) {
+                                                            newSpan1.setAttribute("class", "inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800");
+                                                            let newTextSpan1 = document.createTextNode("Future");
+                                                            newSpan1.appendChild(newTextSpan1);
+                                                        }
+                                                        reservationsContainer.appendChild(newTr);
+
+                                                        let newTd6 = document.createElement("td");
+                                                        newTr.appendChild(newTd6);
+                                                        let newSpan2 = document.createElement("span");
+                                                        newTd6.setAttribute("class", "px-3 py-4 text-xs xl:text-sm whitespace-nowrap text-white");
+                                                        newTd6.appendChild(newSpan2);
+                                                        newSpan2.setAttribute("class", "isolate inline-flex rounded-md shadow-xs");
+
+                                                        let link = document.createElement("a");
+                                                        newSpan2.appendChild(link);
+                                                        link.setAttribute("href", `/catways/${reservation.catwayNumber}/reservations/${reservation._id}`);
+                                                        let button1 = document.createElement("button");
+                                                        button1.setAttribute("class", "relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10");
+                                                        button1.setAttribute("type", "button");
+                                                        link.appendChild(button1);
+                                                        let icon1 = document.createElement("i");
+                                                        icon1.setAttribute("class", "fa-solid fa-pen-to-square");
+                                                        button1.appendChild(icon1);
+
+                                                        let button2 = document.createElement("button");
+                                                        newSpan2.appendChild(button2);
+                                                        button2.setAttribute("class", "relative -ml-px inline-flex items-center rounded-r-md bg-red-500 px-2 py-2 ring-1 ring-gray-300 ring-inset hover:bg-red-400 focus:z-10");
+                                                        button2.setAttribute("type", "button");
+                                                        button2.setAttribute("data-id", `${reservation._id}`);
+                                                        button2.setAttribute("data-clientName", `${reservation.clientName}`);
+                                                        button2.setAttribute("data-startDate", `${reservation.startDate}`);
+                                                        button2.setAttribute("data-endDate", `${reservation.endDate}`);
+                                                        button2.setAttribute("onclick", `openModalDelete(this)`);
+                                                        let icon2 = document.createElement("i");
+                                                        icon2.setAttribute("class", "fa-solid fa-trash");
+                                                        button2.appendChild(icon2);
+
+
+
+                                                        reservationsContainer.appendChild(newTr);
+
+                                                        
+
+                                                    });
+                                                } else {
+                                                    let newTr = document.createElement("tr");
+                                                    let newTd = document.createElement("td");
+                                                    let newText = document.createTextNode("Aucune réservation pour ce catway.");
+                                                    newTr.appendChild(newTd);
+                                                    newTd.appendChild(newText);
+                                                    newTd.setAttribute("class", "py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6 text-center");
+                                                    newTd.setAttribute("colspan", "6");
+                                                    reservationsContainer.innerHTML = "";
+                                                    reservationsContainer.appendChild(newTr);
+                                                }
+                                            })
+                                            .catch(error => {
+                                                console.error('Erreur lors du chargement des réservations:', error);
+                                                let newTr = document.createElement("tr");
+                                                let newTd = document.createElement("td");
+                                                let newText = document.createTextNode("Erreur lors du chargement !");
+                                                newTr.appendChild(newTd);
+                                                newTd.appendChild(newText);
+                                                newTd.setAttribute("class", "py-4 pr-3 pl-1 xl:pl-4 text-xs xl:text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6");
+                                                newTd.setAttribute("colspan", "6");
+                                                reservationsContainer.innerHTML = "";
+                                                reservationsContainer.appendChild(newTr);
+                                            });
+                                    });
+
+                                    function openModalDelete(button) {
+                                        const idReservation = button.getAttribute("data-id");
+                                        const clientName = button.getAttribute("data-clientName");
+                                        const startDate = new Date(button.getAttribute("data-startDate")).toLocaleDateString();
+                                        const endDate = new Date(button.getAttribute("data-endDate")).toLocaleDateString();
+
+                                        const title = document.getElementById("modal-title");
+                                        const message = document.getElementById("modal-message");
+                                        const link = document.getElementById("modal-link");
+
+                                        // Mettez à jour le contenu du titre et du message en fonction de l'utilisateur
+                                        title.innerText = `Supprimer la réservation de ${clientName}`;
+                                        message.innerText = `Êtes-vous sûr de vouloir supprimer la réservation de ${clientName} du ${startDate} au ${endDate} ? Cette action est irréversible.`;
+                                        link.onclick = function() {
+                                            deleteReservation(idReservation);
+                                        };
+                                        // Affiche la modale
+                                        document.getElementById("deleteModal").classList.remove("hidden");
+                                    }
+                                    function closeModalDelete() {
+                                        document.getElementById("deleteModal").classList.add("hidden");
+                                    }
+
+                                    function deleteReservation(idReservation) {
+                                        // Effectuer la requête pour supprimer l'utilisateur
+                                        fetch(`/catways/<%= catways.catwayNumber %>/reservations/${idReservation}`, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            }
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                window.location.href = `/catways/<%= catways.catwayNumber %>?success=DEL`;
+                                            } else {
+                                                window.location.href = `/catways/<%= catways.catwayNumber %>?error=${data.errorInfo}`;
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Erreur:', error);
+                                            window.location.href = `/error?errorCode=500&title=Erreur+Interne&message=Une+erreur+inattendue+est+survenue`;
+                                        });
+                                    }
+                                </script>
+                            </table>
+                            <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+                                <div id="modalBackdrop" onclick="closeModalDelete()" class="absolute inset-0 z-10"></div>
+                                <div id="modalContent" class="relative bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center z-20">
+                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex flex-col items-center justify-center">
+                                    <div class="top-2 left-2 flex flex-col items-center justify-center w-8 h-8 bg-red-100 rounded-full">
+                                    <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                    </svg>
+                                    </div>
+                                    <h3 class="text-base font-semibold text-gray-900" id="modal-title"></h3>
+                                </div>
+                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex flex-col">
+                                    <div class="mt-2">
+                                    <p id="modal-message" class="text-sm text-gray-500"></p>
+                                    </div>
+                                </div>
+                                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                                    <button id="modal-link" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Confirmer</button>
+                                    <button onclick="closeModalDelete()" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Annuler</button>
+                                </div>
+                                </div>
+                            </div>
+                        </section>
                     </section>
+                    <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center <% if (typeof errorMessageCreate !== 'undefined' && errorMessageCreate) { %>block<% } else { %>hidden<% } %>">
+                        <div id="modalBackdrop" onclick="closeModal()" class="absolute inset-0 z-10"></div>
+                        <div id="modalContent" class="bg-white p-6 rounded-lg shadow-lg max-w-5xl w-full text-center z-20 text-black">
+                          <h2 class="text-2xl font-bold mb-4">Créer une réservation</h2>
+                            <% if (typeof errorMessageCreate !== 'undefined' && errorMessageCreate) { %>
+                            <div class="flex items-center p-4 mb-4 text-sm text-red-700 bg-red-100 border-l-4 border-red-500 rounded-lg" role="alert">
+                              <svg class="w-5 h-5 mr-3" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd"></path>
+                              </svg>
+                              <%= errorMessageCreate %>
+                              <% errorMessageCreate = null; %>
+                            </div>
+                            <% } %>
+                          <form action="/catways/<%= catways.catwayNumber %>/reservations" method="post" class="flex flex-col gap-2">
+                                <h3 class="text-xl font-semibold mb-2">Informations sur la réservation</h3>
+                                <div class="relative flex" id="clientNameInput">
+                                    <input id="clientName" name="clientName" type="text" placeholder="Nom du client" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.clientName ? session.formData.clientName : '' %>" >
+                                    <i id="clientNameErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                                </div>
+                                <div class="relative flex" id="boatNameInput">
+                                    <input id="boatName" name="boatName" type="text" placeholder="Nom du bâteau" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.boatName ? session.formData.boatName : '' %>" >
+                                    <i id="boatNameErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                                </div>
+                                <div class="relative flex" id="startDateInput">
+                                    <input id="startDate" onchange="checkAvailableCatways()" name="startDate" type="date" min="<%= today %>" placeholder="Date de début (AAAA-MM-JJ)" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.startDate ? session.formData.startDate : '' %>" >
+                                    <i id="startDateErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                                </div>
+                                <div class="relative flex" id="endDateInput">
+                                    <input id="endDate" onchange="checkAvailableCatways()" name="endDate" type="date" min="<%= today %>" placeholder="Date de fin (AAAA-MM-JJ)" class="w-full px-3 py-2 border rounded" value="<%= session && session.formData && session.formData.endDate ? session.formData.endDate : '' %>" >
+                                    <i id="endDateErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
+                                </div>
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full" type="submit">Créer</button>
+                          </form>
+                          <button onclick="closeModal()" class="text-red-500 mt-4 block w-full">Annuler</button>
+                        </div>
+                    </div>
+                    <script>
+                        function openModal() {
+                        document.getElementById("createModal").classList.remove("hidden");
+                        }
+                        
+                        function closeModal() {
+                        document.getElementById("createModal").classList.add("hidden");
+                        }
+
+                        const startDateInput = document.getElementById('startDate');
+                        const endDateInput = document.getElementById('endDate');
+                        
+                        function checkAvailableCatways() {
+                            const startDate = startDateInput.value;
+                            const endDate = endDateInput.value;
+
+                            endDateInput.setAttribute("min", startDateInput.value);
+                        }
+                    </script>
                 </div>
             </div>
         </div>

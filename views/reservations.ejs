@@ -70,7 +70,7 @@
                                         <span class="isolate inline-flex rounded-md shadow-xs">
                                             <a href="/reservations/<%= reservations._id %>">
                                                 <button type="button" class="relative inline-flex items-center rounded-l-md bg-green-500 px-2 py-2 text-white ring-1 ring-gray-300 ring-inset hover:bg-green-400 focus:z-10">
-                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                    <i class="fa-solid fa-pen-to-square"></i>
                                                 </button>
                                             </a>
                                             <button type="button" onclick="openModalDelete('<%= reservations._id %>', '<%= reservations.clientName %>', '<%= reservations.startDate.toLocaleDateString().slice(0, 10) %>', '<%= reservations.endDate.toLocaleDateString().slice(0, 10) %>')"
