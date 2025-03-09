@@ -81,14 +81,39 @@ exports.checkReservationCatwayExists = async (req, res, next) => {
         const reservation = await Reservation.findOne({ catwayNumber: id, _id: idReservation });
 
         if (!reservation) {
-            return res.status(404).json('Réservation non trouvée sur ce catway');
+            req.session.formData = req.body;
+            return res.redirect(`/catways/${id}?error=RSV_1`);
+            //return res.status(404).json('Réservation non trouvée sur ce catway');
         }
 
         req.reservation = reservation;
         next();
     }
     catch (error) {
-        return res.status(501).json(error);
+        // Code erreur de MongoDB de duplication
+        if (error.code === 11000) {
+            req.session.formData = req.body;
+            return res.redirect(`/catways?error=ADD_3`);
+        }
+        if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
+            console.error(error);
+            req.session.formData = null;
+            // Erreur avec la base de donnée, renvoi vers la page d'erreur
+            return res.render(`error`, {
+                errorCode: '503',
+                title: 'Erreur de base de donnée',
+                message: 'Nous rencontrons des difficultés à contacter la base de données, réessayez plus tard.'
+            })
+        }
+        //return res.status(501).json(error)
+        // Si une erreur non spécifique se produit, envoyer vers page d'erreur standard
+        console.error(error);
+        req.session.formData = null;
+        return res.render(`error`, {
+            errorCode: '500',
+            title: 'Erreur Interne',
+            message: 'Une erreur inattendue est survenue sur le serveur. Veuillez réessayer plus tard.'
+        })
     }
 }
 /**
@@ -101,7 +126,6 @@ exports.checkReservationCatwayExists = async (req, res, next) => {
  * @returns {Response} Retourne une réponse JSON avec une erreur, ou qui valide l'existance de la réservation
  */
 exports.checkReservationExists = async (req, res, next) => {
-    
     const objectIdReservation = req.params.idReservation;
     if (!mongoose.Types.ObjectId.isValid(objectIdReservation)) {
         return res.render(`error`, {
@@ -291,9 +315,10 @@ exports.getById = async (req, res, next) => {
  * @param {Date} endDate - Date de fin de la réservation souhaitée.
  * @returns {Response} Retourne une réponse JSON qui indique la présence ou non d'une réservation sur la période choisie ou une erreur
  */
-const checkReservation = async (catwayNumber, startDate, endDate) => {
+const checkReservation = async (catwayNumber, startDate, endDate, currentReservation = null) => {
     try {
         const presentReservation = await Reservation.findOne({ 
+            _id: { $ne: currentReservation },
             catwayNumber: catwayNumber,
             $or: [
                 { startDate: { $lt: new Date(endDate) }, endDate: { $gt: new Date(startDate) } }, // On vérifie si startdate est < à une date de fin et si une date de fin est > à une date de début, entraînant un cheveauchement
@@ -419,14 +444,21 @@ exports.update = async (req, res, next) => {
         startDate: req.body.startDate,
         endDate: req.body.endDate
     });
+    
+    if (req.params.id && !req.body.catwayNumber) {
+        paramURL = `/catways/${temp.catwayNumber}/reservations`;
+    } else {
+        paramURL = "/reservations";
+    }
+
     console.log(temp);
     if (req.errorCode === "ADD_5")
     {
-        return res.redirect(`/reservations/${idReservation}?error=UPD_5`);
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_5`);
     }
     if(!temp.clientName || !temp.boatName || !temp.startDate || !temp.endDate)
     {
-        return res.redirect(`/reservations/${idReservation}?error=UPD_1`);
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_1`);
         //return res.status(400).json({ error: "Les champs doivent tous être renseignés."});
     }
 
@@ -436,30 +468,30 @@ exports.update = async (req, res, next) => {
 
     let reservation = await Reservation.findOne({ _id: idReservation });
     if (!reservation) {
-        return res.redirect(`/reservations?error=RSV_1`);
+        return res.redirect(`${paramURL}?error=RSV_1`);
     }
 
     if (isNaN(DateDebut) || isNaN(DateFin)) {
         console.error("Erreur : Date invalide détectée !");
-        return res.redirect(`/reservations/${idReservation}?error=DATE_INVALID`);
+        return res.redirect(`${paramURL}/${idReservation}?error=DATE_INVALID`);
     }
 
     if (new Date(reservation.startDate) > DateAct) { // Date existante avant jour actuel, alors on ignore cette vérification
         if (DateDebut <= DateAct) {
-            return res.redirect(`/reservations/${idReservation}?error=UPD_2`); 
+            return res.redirect(`${paramURL}/${idReservation}?error=UPD_2`); 
         }
     }
     else {
         temp.startDate = reservation.startDate;
     }
     if (DateDebut > DateFin) {
-        return res.redirect(`/reservations/${idReservation}?error=UPD_3`);
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_3`);
         //return res.status(400).json({ error: "La date de début ne peut être postérieure à la date de fin."});
     }
 
-    const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate);
+    const presentReservation = await checkReservation(temp.catwayNumber, temp.startDate, temp.endDate, idReservation);
     if (presentReservation) {
-        return res.redirect(`/reservations/${idReservation}?error=UPD_4`);
+        return res.redirect(`${paramURL}/${idReservation}?error=UPD_4`);
         //return res.status(400).json({ error: "Une réservation existe déjà sur ce créneau." });
     }
 
@@ -472,11 +504,11 @@ exports.update = async (req, res, next) => {
             Object.assign(reservation, temp);
             await reservation.save({ validateModifiedOnly: true });
             //return res.status(201).json(user);
-            return res.redirect(`/reservations/${idReservation}?success=UPD`);
+            return res.redirect(`${paramURL}/${idReservation}?success=UPD`);
         }
 
         
-        return res.redirect(`/reservations?error=RSV_1`);
+        return res.redirect(`${paramURL}?error=RSV_1`);
     } catch (error) {
         // Code erreur de MongoDB de duplication
         if (error.name === 'MongoNetworkError' || error.name === 'MongoTimeoutError') {
