@@ -9,6 +9,53 @@ const session = require('express-session');
 // Import du middleware pour privatisation
 const private = require('../middlewares/private');
 
+
+/**
+ * @swagger
+ * /available:
+ *   get:
+ *     tags:
+ *       - "Reservations"
+ *     summary: "Recherche les catways disponibles"
+ *     description: "Selon le type de catway et les dates choisies, ont exporte la liste des catways afin de mettre à jour le formulaire de réservation."
+ *     parameters:
+ *       - name: "idReservation"
+ *         in: "path"
+ *         required: true
+ *         description: "ID de la réservation recherchée."
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: "Réservation récupérée avec succès."
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   catwayNumber:
+ *                     type: number
+ *                   clientName:
+ *                     type: string
+ *                   boatName:
+ *                     type: string
+ *                   startDate:
+ *                     type: string
+ *                     format: date
+ *                   endDate:
+ *                     type: string
+ *                     format: date
+ *       400:
+ *          description: "L'ID de réservation ressort un format non valide"
+ *       401:
+ *          description: "Token de sécurité invalide ou inexistant"
+ *       404:
+ *          description: "Réservation non trouvée"
+ *       501:
+ *         description: "Erreur serveur."
+ */
 router.get('/', async (req, res) => {
     console.log("Requête reçue avec paramètres :", req.query);
     try {
