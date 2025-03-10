@@ -3,7 +3,7 @@
  * @module services/access
  */
 const User = require('../models/users');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 /**
  * Authentifie un utilisateur en vérifiant l'email et le mot de passe

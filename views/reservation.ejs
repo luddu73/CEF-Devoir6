@@ -42,8 +42,8 @@
                             <% } %>
                         </h2>
                         <p class="m-3 text-blue-900">Numéro de catway : <%= reservations.catwayNumber %></p>
-                        <p class="m-3 text-blue-800"> Date de début : <%= reservations.startDate.toLocaleDateString().slice(0, 10) %></p>
-                        <p class="m-3 text-blue-800"> Date de fin : <%= reservations.endDate.toLocaleDateString().slice(0, 10) %></p>
+                        <p class="m-3 text-blue-800"> Date de début : <%= new Date(reservations.startDate).toLocaleDateString('fr-FR').slice(0, 10) %></p>
+                        <p class="m-3 text-blue-800"> Date de fin : <%= new Date(reservations.endDate).toLocaleDateString('fr-FR').slice(0, 10) %></p>
                         <button onclick="openModal()" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <i class="fa-solid fa-pen"></i> Modifier
                         </button>
