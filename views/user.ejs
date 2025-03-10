@@ -30,7 +30,7 @@
                                     <% errorMessage = null; %>
                                 <% } %>
                             </div>
-                        <h2 class="text-blue-900 text-lg font-bold mb-3"><i class="fa-solid fa-user"></i> Utilisateur <%= user.username %></h2>
+                        <h2 class="text-blue-900 text-lg font-bold mb-3"><i class="fa-solid fa-user"></i> Utilisateur <%= users.username %></h2>
                         <button onclick="launchModify()" id="modifyButton" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <i class="fa-solid fa-pen"></i> Modifier
                         </button>
@@ -52,16 +52,16 @@
                             }
                         </script>
                         <div class="flex items-center justify-center">
-                            <form action="/users/<%= user.email %>?_method=PUT" method="post"  class="flex flex-col gap-2 m-3 p-3 xl:w-2/4 text-center">
+                            <form action="/users/<%= users.email %>?_method=PUT" method="post"  class="flex flex-col gap-2 m-3 p-3 xl:w-2/4 text-center">
                                 <div class="flex flex-col gap-2 flex-wrap text-black">
                                     <div class="relative flex" id="usernameInput">
                                         <label for="username" class="w-1/2">Nom d'utilisateur</label>
-                                        <input id="username" name="username" type="text" placeholder="Nom d'utilisateur" class="px-3 py-2 border rounded w-1/2" value="<%= user.username %>" disabled required>
+                                        <input id="username" name="username" type="text" placeholder="Nom d'utilisateur" class="px-3 py-2 border rounded w-1/2" value="<%= users.username %>" disabled required>
                                         <i id="usernameErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                                     </div>
                                     <div class="relative flex" id="emailInput">
                                         <label for="email" class="w-1/2">Adresse email</label>
-                                        <input type="email" name="email" id="email" class="px-3 py-2 border rounded pr-10 w-1/2" placeholder="Email" value="<%= user.email %>" disabled required>
+                                        <input type="email" name="email" id="email" class="px-3 py-2 border rounded pr-10 w-1/2" placeholder="Email" value="<%= users.email %>" disabled required>
                                         <i id="emailErrorIcon" class="fa-solid fa-triangle-exclamation absolute right-3 mt-1 text-red-400 text-3xl" style="display: none;"></i>
                                     </div>
                                     <div class="relative xl:flex">

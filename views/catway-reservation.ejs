@@ -42,8 +42,8 @@
                                 <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">Future</span>
                             <% } %>
                         </h3>
-                        <p class="m-3 text-blue-800"> Date de début : <%= reservations.startDate.toLocaleDateString().slice(0, 10) %></p>
-                        <p class="m-3 text-blue-800"> Date de fin : <%= reservations.endDate.toLocaleDateString().slice(0, 10) %></p>
+                        <p class="m-3 text-blue-800"> Date de début : <%= new Date(reservations.startDate).toLocaleDateString('fr-FR').slice(0, 10) %></p>
+                        <p class="m-3 text-blue-800"> Date de fin : <%= new Date(reservations.endDate).toLocaleDateString('fr-FR').slice(0, 10) %></p>
                         <button onclick="openModal()" type="button" class="inline-flex items-center gap-x-2 rounded-md bg-blue-600 px-2 py-1 text-sm font-semibold shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <i class="fa-solid fa-pen"></i> Modifier
                         </button>

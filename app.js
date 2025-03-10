@@ -15,6 +15,7 @@ var logger = require('morgan');
 var { swaggerUi, swaggerDocs, swaggerUiOptions } = require("./swaggerConfig");
 var cors = require('cors');
 const session = require('express-session'); 
+const MongoStore = require('connect-mongo');
 const methodOverride = require('method-override');
 
 var indexRouter = require('./routes/index');
@@ -52,15 +53,19 @@ if (process.env.NODE_ENV !== "production") {
   };
   app.use(cors(corsOptions));
     app.use(session({
-      secret: 'TESTKEY',
+      secret: 'TESTKEY', // Remplace 'supersecret' par une vraie valeur sécurisée en prod
       resave: false,
-      saveUninitialized: true,
-      cookie: { 
-        secure: false, // En développement, on peut mettre secure: false (en production, il faut le mettre à true si on utilise HTTPS)
-        httpOnly: true,
-        maxAge: 60 * 60 * 1000 // 1h
-      }      
-    }));
+      saveUninitialized: false,
+      store: MongoStore.create({
+          mongoUrl: process.env.URL_MONGO, // Utilise ton URI MongoDB
+          collectionName: 'sessions'
+      }),
+      cookie: {
+          maxAge: 1000 * 60 * 60 * 24, // 1 jour
+          secure: process.env.NODE_ENV === 'production', // Seulement HTTPS en production
+          httpOnly: true
+      }
+  }));
 } else {
   console.log("🌐 CORS configuré en mode production");
   const corsOptions = {
@@ -70,15 +75,20 @@ if (process.env.NODE_ENV !== "production") {
     credentials: true, // Autorise l'envoi de cookies/token en production
   };
   app.use(cors(corsOptions));
-  app.use(session({
-    secret: 'XJSOHNGFS5*5',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-      secure: true, // En développement, on peut mettre secure: false (en production, il faut le mettre à true si on utilise HTTPS)
-      httpOnly: true,
-      maxAge: 60 * 60 * 1000 // 1h
-    }
+  app.use(cors(corsOptions));
+    app.use(session({
+      secret: 'XJSOHNGFS5*5', // Remplace 'supersecret' par une vraie valeur sécurisée en prod
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({
+          mongoUrl: process.env.URL_MONGO, // Utilise ton URI MongoDB
+          collectionName: 'sessions'
+      }),
+      cookie: {
+          maxAge: 1000 * 60 * 60, // 1 jour
+          secure: process.env.NODE_ENV === 'production', // Seulement HTTPS en production
+          httpOnly: true
+      }
   }));
 }
 

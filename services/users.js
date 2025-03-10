@@ -4,7 +4,7 @@
  */
 
 const User = require('../models/users');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 /**
@@ -191,7 +191,7 @@ exports.getByEmail = async (req, res, next) => {
         let user = await User.findOne({ email });
 
         if (user) {
-            res.locals.user = user;
+            res.locals.users = user;
             return next();
         }
 
