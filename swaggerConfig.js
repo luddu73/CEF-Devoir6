@@ -1,6 +1,6 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
-
+console.log("Chargement du fichier swaggerConfig.js...");
 // Définition des options de Swagger
 const swaggerOptions = {
   definition: {
@@ -38,7 +38,8 @@ const swaggerUiOptions = {
     swaggerOptions: {
       docExpansion: "none", // Réduit toutes les routes par défaut
       supportedSubmitMethods: process.env.NODE_ENV === "development" ? ['get', 'post', 'put', 'delete'] : [], // N'active les tests qu'en mode développement
-    }
+    },
+  customCssUrl: "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.20.1/swagger-ui.css"
   };
 
 // Générer la doc Swagger

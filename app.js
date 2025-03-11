@@ -12,7 +12,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var { swaggerUi, swaggerDocs, swaggerUiOptions } = require("./swaggerConfig");
+try {
+  var { swaggerUi, swaggerDocs, swaggerUiOptions } = require("./swaggerConfig");
+  console.log("📖 Swagger config chargé !");
+} catch (error) {
+  console.error("❌ Erreur lors du chargement de swaggerConfig.js :", error);
+}
 var cors = require('cors');
 const session = require('express-session'); 
 const MongoStore = require('connect-mongo');
