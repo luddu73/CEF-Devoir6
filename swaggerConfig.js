@@ -26,7 +26,7 @@ const swaggerOptions = {
             description: "Serveur de développement"
         },
         {
-            url: "...",
+            url: "https://cef-devoir6.vercel.app/",
             description: "Serveur de production"
         }
     ]
